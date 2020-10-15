@@ -1,0 +1,25 @@
+@import '../../assets/css/params.less';
+
+footer.ft {
+    display: table-row;
+    height: @footerHeight;
+    line-height: @footerHeight;
+    color: #fff;
+    font-size: @smallerFont;
+    text-align: center;
+    white-space: nowrap;
+    user-select: none;
+    a {
+        text-decoration: none;
+        color: inherit;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+    &:after, &:before {
+        content: '';
+        display: inline-block;
+        width: 20px;
+        height: 0;
+    }
+}

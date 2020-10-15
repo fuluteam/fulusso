@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+
+  <!--<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="IdentityModel" Version="4.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.1" />
+  </ItemGroup>-->
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.1'">
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="5.0.1" />
+    <PackageReference Include="IdentityModel" Version="4.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Fulu.Authentication\Fulu.Authentication.csproj" />
+    <ProjectReference Include="..\Fulu.AutoDI\Fulu.AutoDI.csproj" />
+    <ProjectReference Include="..\Fulu.BouncyCastle\Fulu.BouncyCastle.csproj" />
+    <ProjectReference Include="..\Fulu.EntityFrameworkCore\Fulu.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\Fulu.Extensions.Caching.Redis\Fulu.Extensions.Caching.Redis.csproj" />
+    <ProjectReference Include="..\Fulu.Google.Authenticator\Fulu.Google.Authenticator.csproj" />
+    <ProjectReference Include="..\Fulu.Http\Fulu.Http.csproj" />
+    <ProjectReference Include="..\Fulu.TransferJob\Fulu.TransferJob.csproj" />
+    <ProjectReference Include="..\Fulu.WebAPI.Abstractions\Fulu.WebAPI.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

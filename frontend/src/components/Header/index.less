@@ -1,0 +1,66 @@
+@import '../../assets/css/params.less';
+
+header.hd {
+    padding: 46px;
+    .wrap {
+        position: relative;
+        min-width: 400px;
+        height: inherit;
+        background: inherit;
+        margin: auto;
+        .logo-link {
+            display: inline-block;
+        }
+        .logo {
+            display: inline-block;
+            width: 153px;
+            height: 50px;
+            background: url(../../assets/image/logo.png);
+            background-size: cover;
+        }
+        &:before {
+            content: '';
+            display: inline-block;
+            height: 100%;
+            width: 0;
+            vertical-align: middle;
+        }
+    }
+    .user-info {
+        float: right;
+        line-height: 80px;
+        height: 80px;
+        font-size: 14px;
+        * {
+            vertical-align: middle;
+        }
+        .name {
+            position: relative;
+            padding-right: 20px;
+            margin-right: 10px;
+            &:after {
+                content: '';
+                position: absolute;
+                width: 1px;
+                height: 18px;
+                background: 
+                #404040;
+                top: 2px;
+                right: 4px;
+                opacity: 0.3;
+            }
+        }
+        .avatar {
+            display: inline-block;
+            line-height: initial;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+        a {
+            color: inherit;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}

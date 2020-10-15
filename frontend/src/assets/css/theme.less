@@ -1,0 +1,40 @@
+@themeColor: #1764FF;
+@themeHoverColor: #336aff;
+
+.ant-btn {
+    border-radius: 0;
+}
+.ant-btn.ant-btn-primary {
+    background: @themeColor;
+    border-color: @themeColor;
+    color: #fff;
+    &:not([disabled]) {
+        &:hover, &:focus {
+            color: #fff;
+            background: @themeHoverColor;
+            border-color: @themeHoverColor;
+        }
+    }
+}
+.ant-btn.ant-btn-primary[disabled] {
+    color: rgba(0, 0, 0, 0.25);
+    background-color: #f5f5f5;
+    border-color: #d9d9d9;
+}
+.ant-btn:hover, .ant-btn:focus {
+    border-color: @themeHoverColor;
+    color: @themeHoverColor;
+}
+.ant-tabs-nav .ant-tabs-tab-active {
+    color: @themeColor;
+}
+.ant-tabs-nav .ant-tabs-tab:hover {
+    color: @themeHoverColor;
+}
+.ant-tabs-ink-bar {
+    background-color: @themeColor;
+}
+.ant-checkbox-checked .ant-checkbox-inner {
+    background-color: @themeColor;
+    border-color: @themeColor;
+}

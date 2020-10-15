@@ -1,0 +1,53 @@
+<Project>
+
+  <PropertyGroup>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- netcore -->
+    <DotNetCoreFxVersion>4.5.0</DotNetCoreFxVersion>
+    <SystemThreadingTasksDataflowVersion>4.9.0</SystemThreadingTasksDataflowVersion>
+    <EFCoreVersion>2.1.4</EFCoreVersion>
+    <EFCoreSqliteVersion>2.1.4</EFCoreSqliteVersion>
+
+    <EFCoreVersionV3>3.1.0</EFCoreVersionV3>
+    <EFCoreMysqlVersionV3>3.1.0</EFCoreMysqlVersionV3>
+
+    <!-- aspnetcore-->
+    <AspNetCoreVersion>2.1.1</AspNetCoreVersion>
+    <AspNetCoreMvcVersioningVersion>2.3.0</AspNetCoreMvcVersioningVersion>
+    <AspNetCoreHttpConnectionsVersion>1.0.0</AspNetCoreHttpConnectionsVersion>
+    <SignalRVersion>1.0.0</SignalRVersion>
+    <MicrosoftExtensionsVersion>2.1.1</MicrosoftExtensionsVersion>
+    <MicrosoftExtensionsPlatformAbstractionsVersion>1.1.0</MicrosoftExtensionsPlatformAbstractionsVersion>
+
+
+    <!-- aspnetcoreV3-->
+    <AspNetCoreVersionV3>3.1.0</AspNetCoreVersionV3>
+    <AspNetCoreMvcVersioningVersionV3>3.1.0</AspNetCoreMvcVersioningVersionV3>
+    <MicrosoftExtensionsVersionV3>3.1.0</MicrosoftExtensionsVersionV3>
+    <!-- sdk -->
+    <SystemThreadingTasksExtensions>4.5.1</SystemThreadingTasksExtensions>
+    <JaegerVersion>0.3.2</JaegerVersion>
+    <SourceLinkVersion>2.8.3</SourceLinkVersion>
+    <NewtonsoftJsonVersion>12.0.1</NewtonsoftJsonVersion>
+    <NewtonsoftJsonVersionV3>12.0.2</NewtonsoftJsonVersionV3>
+    <SpanJsonVersion>1.3.0</SpanJsonVersion>
+    <DapperVersion>1.50.5</DapperVersion>
+    <MysqlDataVersion>8.0.11</MysqlDataVersion>
+    <MailKitVersion>2.0.4</MailKitVersion>
+    <FluentValidationVersion>7.5.2</FluentValidationVersion>
+    <ReactiveExtensionsVersion>4.0.0</ReactiveExtensionsVersion>
+    <IdentityModel>3.8.0</IdentityModel>
+    <log4netVersion>2.0.8</log4netVersion>
+    <SwashbuckleVersion>5.6.0</SwashbuckleVersion>
+    <SwashbuckleAspNetCoreVersion>3.0.0</SwashbuckleAspNetCoreVersion>
+    <ConfluentKafkaVersion>1.0.0-beta2</ConfluentKafkaVersion>
+    <sqlSugarCoreVersion>4.6.4.9</sqlSugarCoreVersion>
+    <AutoMapperVersion>7.0.1</AutoMapperVersion>
+    <AutoMapperExtensionsMicrosoftDependencyInjectionVersion>5.0.1</AutoMapperExtensionsMicrosoftDependencyInjectionVersion>
+    <MessagePackVersion>1.7.3.4</MessagePackVersion>
+    <PortableBouncyCastleVersion>1.8.2</PortableBouncyCastleVersion>
+  </PropertyGroup>
+</Project>

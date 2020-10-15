@@ -1,0 +1,338 @@
+@import './params.less';
+@import './theme.less';
+
+html {
+    height: 100%;
+    background-image: url(../image/bg.png);
+    background-size: cover;
+    background-position: center;
+}
+body {
+    min-width: 600px;
+    min-height: 750px;
+    background: transparent !important;
+}
+p {
+    margin-bottom: 0;
+}
+input:-internal-autofill-previewed,
+input:-internal-autofill-selected {
+    background-color: transparent !important;
+}
+#app {
+    height: 100%;
+    height: 100vh;
+    min-height: 100%;
+    width: 100%;
+    display: table;
+}
+.f-l {
+    float: left;
+}
+.f-r {
+    float: right;
+}
+a {
+    color: @themeColor;
+}
+.main-box {
+    display: table-row;
+    .wrap-box {
+        position: absolute;
+        width: 100%;
+        min-height: 540px;
+        top: @headerHeight;
+        bottom: @footerHeight;
+        .content-box {
+            &.writing-mode-middle {
+                text-align: center;
+                writing-mode: vertical-lr;
+            }
+            &:after {
+                content: '';
+                display: table;
+            }
+        }
+    }
+    .form-header {
+        font-size: 18px;
+        color: #5A5A5A;
+        border-left: 4px solid @themeColor;
+        padding-left: 10px;
+        line-height: 1;
+    }
+    .inpt-code {
+        padding-right: 90px;
+    }
+    .btn-send-code {
+        float: right;
+        margin-left: -84px;
+        padding-left: initial !important;
+        background: transparent;
+        padding: 0;
+        border: none;
+        color: @themeColor;
+    }
+    .ant-form-item-required::before {
+        display: none;
+    }
+    .form-help-item {
+        font-size: 12px;
+        label {
+            font-size: inherit;
+            color: #5A5A5A;
+        }
+    }
+    .ant-form-item {
+        margin-top: 18px;
+        margin-bottom: 0px;
+        .ant-input {
+            background: #fff;
+            border-color: transparent;
+            font-size: 15px;
+            color: @gray;
+            border-radius: 0;
+            border-bottom-color: #E8E8E8;
+            &:focus {
+                box-shadow: none;
+            }
+        }
+        .has-error {
+            .ant-input {
+                border-bottom-color: red;
+            }   
+        }
+    }
+    .ant-form-item-label {
+        line-height: 35px;
+    }
+    .btn-form {
+        height: 45px;
+    }
+    .ant-btn, .btn-send-code, .ant-input {
+        height: 45px;
+        line-height: 45px;
+    }
+    .ant-btn-primary {
+        font-size: 16px;
+    }
+    .normal-link {
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+    .ant-form-explain,
+    .ant-form-split {
+        color: red;
+        position: absolute !important;
+    }
+}
+.user-rules {
+    .content {
+        width: 579px;
+        height: 282px;
+        padding: 12px 25px 8px 25px;
+        border: 1px solid rgba(151,151,151,0.3);
+        margin: auto;
+        border-radius: 2px;
+        line-height: 22px;
+        color: #212121;
+        overflow: auto;
+        font-size: 12px;
+        p {
+            text-indent: 2em;
+        }
+    }
+    .ant-modal-header {
+        border-bottom: none;
+        padding-bottom: 0;
+        padding-top: 30px;
+    }
+    .ant-modal-title {
+        text-align: center;
+    }
+}
+
+.main-box {
+    .content-box {
+        position: absolute;
+        width: 600px;
+        height: 400px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0px 15px 15px 0px rgba(0, 0, 0, 0.24);
+        left: 50%;
+        top: 50%;
+        margin-left: -300px;
+        margin-top: -200px;
+        padding: 40px 46px;
+        .btn-register {
+            display: none;
+        }
+        .l-area {
+            width: 295px;
+        }
+        .or-area {
+            margin: 0 40px;
+            color: #D9D9D9;
+            height: 326px;
+            &:after {
+                content: '';
+                width: 0;
+                height: 100%;
+                display: inline-block;
+                vertical-align: middle;
+                border-left: 1px dotted #E8E8E8;
+            }
+            .or {
+                position: relative;
+                vertical-align: middle;
+                right: -50%;
+                background: #fff;
+                line-height: 2.5;
+                display: inline-block;
+            }
+        }
+        .other-area {
+            width: 100px;
+            color: #5A5A5A;
+            p {
+                margin-bottom: 10px;
+                font-size: @smallerFont;
+            }
+        }
+        .ant-tabs-nav-scroll {
+            text-align: center;
+            font-size: @bigFont;
+            .ant-tabs-nav {
+                width: 100%;
+                .ant-tabs-tab {
+                    padding-top: 0;
+                    width: 50%;
+                    margin: 0;
+                }
+                .ant-tabs-ink-bar {
+                    width: 50% !important;
+                }
+            }
+        }
+        .help-link {
+            position: relative;
+            margin-top: 80px;
+            font-size: @smallerFont;
+            a {
+                font-size: @normalFont;
+                line-height: 1.5;
+            }
+        }
+        .btn-login {
+            width: 100%;
+            margin-top: 24px;
+        }
+        .third-party-login-box {
+            margin-top: 50px;
+            user-select: none;
+            .login-icon {
+                display: inline-block;
+                width: 24px;
+                height: 24px;
+                cursor: pointer;
+                & + .login-icon {
+                    margin-left: 10px;
+                }
+            }
+            span, a {
+                vertical-align: middle;
+            }
+            .login-icon.wechat {
+                background: url("../../assets/image/login-wechat.png");
+            }
+            .login-icon.wechat:hover {
+                background: url("../../assets/image/login-wechat-hover.png");
+            }
+            .login-icon.ding {
+                background: url("../../assets/image/login-ding.png");
+            }
+            .login-icon.ding:hover {
+                background: url("../../assets/image/login-ding-hover.png");
+            }
+            .login-icon.qy-wechat {
+                background: url("../../assets/image/login-qy-wechat.png");
+            }
+            .login-icon.qy-wechat:hover {
+                background: url("../../assets/image/login-qy-wechat-hover.png");
+            }
+        }
+    }
+}
+.content-box .other-area .help-link {
+    p {
+        margin-bottom: 0;
+    }
+    span {
+        vertical-align: middle;
+    }
+    .arrow-right {
+        width: 1em;
+        height: 1em;
+        vertical-align: middle;
+        fill: currentcolor;
+        overflow: hidden;
+        margin-left: 5px;
+        font-size: 1.35em;
+    }
+}
+@media (max-width: 600px) {
+    body {
+        min-width: initial;
+        min-height: initial;
+    }
+    header.hd {
+        padding: 20px;
+        .wrap {
+            min-width: initial;
+        }
+    }
+    .main-box .ant-form-item {
+        margin-top: @bigMargin;
+    }
+    .main-box .content-box {
+        width: 320px;
+        height: 480px;
+        margin-left: -160px;
+        margin-top: -240px;
+        padding: 40px 20px;
+        .btn-login {
+            margin-top: @baseMargin;
+        }
+        .btn-register {
+            display: block;
+            margin-top: @baseMargin;
+        }
+        .f-l {
+            float: none;
+        }
+        .l-area {
+            width: initial;
+        }
+        .or-area {
+            display: none;
+        }
+        .third-party-login-box {
+            margin-top: @bigMargin;
+            .login-icon + .login-icon {
+                margin-left: 50px;
+            }
+        }
+        .other-area {
+            width: initial;
+            text-align: center;
+            .help-link {
+                display: none;
+            }
+        }
+    }
+    footer.ft {
+        display: none;
+    }
+}

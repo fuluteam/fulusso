@@ -1,0 +1,104 @@
+stages:
+- deploy
+
+
+################## 模板 ##################
+.deploy-OSS: &deploy-OSS
+  stage: deploy
+  image: registry.cn-hangzhou.aliyuncs.com/ich-sre/oss:v1
+  script:
+    - cp ./src/configs/${CONFIG_NAME} ./dist/resources/js/configs.js
+    - ossutil64 mkdir oss://qianduan-prod-ci-dev/${ENV_NAME}/$CI_PIPELINE_ID/ -e oss-cn-hangzhou.aliyuncs.com  -i ${OSS_KEY_ID} -k ${OSS_KEY_SECRET}
+    - ossutil64 cp -r  ./dist oss://qianduan-prod-ci-dev/${ENV_NAME}/$CI_PIPELINE_ID -e oss-cn-hangzhou.aliyuncs.com  -i ${OSS_KEY_ID} -k ${OSS_KEY_SECRET}
+    - echo oss://qianduan-prod-ci-dev/${ENV_NAME}/$CI_PIPELINE_ID
+
+################## 部署到线上集群 ##################
+
+## 开发环境
+deploy-dev:
+  <<: *deploy-OSS
+  variables:
+    CONFIG_NAME: configs.js
+    ENV_NAME: Development
+  only:
+    - develop
+  except:
+    - tags
+  environment:
+    name: Development
+  allow_failure: false
+
+
+## 测试环境
+deploy-test:
+  <<: *deploy-OSS
+  variables:
+    CONFIG_NAME: configs.test.js
+    ENV_NAME: Test
+  only:
+    - /^release\/[\S]+$/
+  except:
+    - tags
+  environment:
+    name: Test
+  allow_failure: false
+
+
+## 压测环境
+deploy-perf:
+  <<: *deploy-OSS
+  variables:
+    CONFIG_NAME: configs.perf.js
+    ENV_NAME: Perf
+  only:
+    - /^yace\/[\S]+$/
+  except:
+    - tags
+  environment:
+    name: Perf
+  allow_failure: false
+
+
+## 集成测试环境
+deploy-beta:
+  <<: *deploy-OSS
+  variables:
+    CONFIG_NAME: configs.it.js
+    ENV_NAME: Beta
+  only:
+    - /^beta\/[\S]+$/
+  except:
+    - tags
+  environment:
+    name: Beta
+  allow_failure: false
+
+
+## 预发布环境
+deploy-pre:
+  <<: *deploy-OSS
+  variables:
+    CONFIG_NAME: configs.pre.js
+    ENV_NAME: Staging
+  only:
+    - master
+  except:
+    - tags
+  environment:
+    name: Staging
+  allow_failure: false
+
+
+## 生产环境
+deploy-prod:
+  <<: *deploy-OSS
+  variables:
+    CONFIG_NAME: configs.prod.js
+    ENV_NAME: Production
+  only:
+    - /^rel-[\S]+$/
+  except:
+    - branches
+  environment:
+    name: Production
+  allow_failure: false

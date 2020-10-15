@@ -1,0 +1,55 @@
+{
+    "parser": "babel-eslint",
+    "extends": "airbnb",
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "globals": {
+        "ReactDom": false
+    },
+    "plugins": [
+        "react"
+    ],
+    "rules": {
+        "indent": ["error", 4, { "SwitchCase": 1, "VariableDeclarator": { "var": 2, "let": 2, "const": 3 } }],
+        "quotes": ["error", "single", { "allowTemplateLiterals": true, "avoidEscape": true }],
+        "linebreak-style": "off",
+        "max-len": ["error", { "code": 120, "ignoreTemplateLiterals": true, "ignoreRegExpLiterals": true, "ignoreUrls": true }],
+        "class-methods-use-this": "off",
+        "consistent-return": ["error", { "treatUndefinedAsUnspecified": false }],
+        "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+        "no-param-reassign": ["error", { "props": false }],
+        "no-continue": "off",
+        "no-script-url": "off",
+        "no-tabs": "off",
+        "arrow-body-style": "off",
+        "object-curly-newline": "off",
+        "no-underscore-dangle": "off",
+        "no-restricted-syntax": [
+            "error",
+            "ForOfStatement",
+            "LabeledStatement",
+            "WithStatement"
+        ],
+        "no-unused-expressions": ["error", { "allowTaggedTemplates": true }],
+        "prefer-promise-reject-errors": "off",
+        "import/prefer-default-export": "off",
+        "react/jsx-no-bind": "off",
+        "react/jsx-filename-extension": "off",
+        "react/forbid-prop-types": ["error", { "forbid": ["any"] }],
+        "react/jsx-indent": ["error", 4],
+        "react/jsx-indent-props": [2, 4],
+        "react/react-in-jsx-scope": "off",
+        "react/prefer-stateless-function": [1, { "ignorePureComponents": true }],
+        "react/jsx-closing-tag-location": "off",
+        "react/no-array-index-key": 2,
+        "jsx-a11y/no-static-element-interactions": "off",
+        "jsx-a11y/no-noninteractive-element-interactions": "off",
+        "jsx-a11y/anchor-is-valid": [0],
+        "jsx-a11y/click-events-have-key-events": [0],
+        "react/no-access-state-in-setstate": "off",
+        "react/jsx-one-expression-per-line": "off",
+        "no-debugger": "off"
+    }
+}

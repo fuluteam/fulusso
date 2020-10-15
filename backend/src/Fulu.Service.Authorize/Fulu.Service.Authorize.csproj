@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <PackageReference Include="IdentityModel" Version="$(IdentityModel)" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="$(AspNetCoreVersion)" />
+    <ProjectReference Include="..\Fulu.Authentication\Fulu.Authentication.csproj" />
+    <ProjectReference Include="..\Fulu.Http\Fulu.Http.csproj" />
+    <ProjectReference Include="..\Fulu.WebAPI.Abstractions\Fulu.WebAPI.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
+    <PackageReference Include="IdentityModel" Version="$(IdentityModel)" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="$(AspNetCoreVersionV3)" />
+    <ProjectReference Include="..\Fulu.Authentication\Fulu.Authentication.csproj" />
+  </ItemGroup>
+
+
+</Project>

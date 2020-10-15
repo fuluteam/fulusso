@@ -1,0 +1,157 @@
+.operation-card {
+    position: relative;
+    background-color: #fff;
+    height: 160px;
+    margin-bottom: 30px;
+    box-shadow: 0 1px 0 0 #e6e7e8;
+    display: table;
+    width: 100%;
+    padding: 0 36px;
+    z-index: 1;
+    .bind-status {
+        font-size: 12px;
+        color:#919191;
+        margin-left: 5px;
+    }
+    &.account {
+        &:before {
+            background-position: 4px -74px;
+        }
+        .icon {
+            background: url(../../assets/image/account-icon.png);
+        }
+        .icon-inner-wrapper:before {
+            background-position: -385px -7px;
+        }
+        .icon-inner-wrapper::after {
+            background-position: -385px -33px;
+        }
+    }
+    &.auth {
+        &:before {
+            background-position: -156px -74px;
+            width: 157px;
+        }
+        .icon {
+            background: url(../../assets/image/phone-icon.png);
+        }
+        .icon-inner-wrapper:before {
+            background-position: -412px -8px;
+        }
+        .icon-inner-wrapper::after {
+            background-position: -418px -33px;
+        }
+    }
+    &.e-app {
+        &:before {
+            background-position: -322px -76px;
+        }
+        .icon {
+            background: url(../../assets/image/token-icon.png);
+        }
+        .icon-inner-wrapper:before {
+            background-position: -443px -11px;
+        }
+        .icon-inner-wrapper::after {
+            background-position: -438px -43px;
+        }
+    }
+    &.validate {
+        &:before {
+            background-position: -156px -74px;
+            width: 157px;
+        }
+        .icon {
+            background: url(../../assets/image/validate-icon.png);
+        }
+        .icon-inner-wrapper:before {
+            background-position: -412px -8px;
+        }
+        .icon-inner-wrapper::after {
+            background-position: -438px -43px;
+        }
+    }
+    &>div {
+        display: table-cell;
+        vertical-align: middle;
+        line-height: 1;
+    }
+    &:before {
+        content: '';
+        position: absolute;
+        right: 0;
+        width: 160px;
+        height: 160px;
+        background-image: url(../../assets/image/sprites.png);
+        z-index: -1;
+    }
+    .content-box {
+        color: #404040;
+        padding-left: 24px;
+        .card-title {
+            margin-bottom: 12px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .card-tips {
+            font-size: 12px;
+            color: #919191;
+        }
+    }
+    .icon-box {
+        width: 63px;
+        display: table-cell;
+        vertical-align: middle;
+        line-height: 1;
+        .icon-inner-wrapper {
+            position: relative;
+            &:before, &:after {
+                content: '';
+                position: absolute;
+                width: 16px;
+                height: 16px;
+                left: 50%;
+                top: 50%;
+                margin-left: -8px;
+                margin-top: -8px;
+                background-image: url(../../assets/image/sprites.png);
+                z-index: -1;
+                transition: all linear 300ms;
+            }
+            &:hover {
+                &:before {
+                    left: 0;
+                    top: 0;
+                }
+                &:after {
+                    left: 100%;
+                    top: 100%;
+                }
+            }
+        }
+        .icon {
+            position: relative;
+            display: block;
+            width: 57px;
+            height: 63px;
+        }
+    }
+    .btn-box {
+        width: 106px;
+        text-align: right;
+        .ant-btn {
+            width: 100%;
+        }
+    }
+    .btn-center {
+        display: inline-block;
+        color: #fff;
+        width: 106px;
+        height: 32px;
+        line-height: 32px;
+        background: #336aff;
+        border-radius: 2px;
+        text-align: center;
+        vertical-align: middle;
+    }
+}

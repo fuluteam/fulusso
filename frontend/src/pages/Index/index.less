@@ -1,0 +1,139 @@
+@import '../../assets/css/params.less';
+@import '../../assets/css/theme.less';
+
+body {
+    background: #f7f8fa !important;
+}
+#app,
+.ant-spin-nested-loading,
+.ant-spin-container {
+    height: 100%;
+}
+.main-wrapper {
+    height: 100%;
+    margin-bottom: -80px;
+}
+.footer-holder {
+    height: 80px;
+}
+header {
+    margin: auto;
+    background: #fff;
+    &.hd {
+        height: 80px;
+        padding: 0;
+    }
+    &.t-header {
+        .wrap {
+            font-size: 16px;
+            color: #404040;
+            width: @mainWidth;
+            min-width: @mainWidth !important;
+            max-width: @mainWidth !important;
+            .logo {
+                width: 120px !important;
+                height: 40px !important;
+                background: url(../../assets/image/logo-black.png) !important;
+                vertical-align: middle;
+            }
+            .btn-login {
+                position: absolute;
+                right: 36px;
+                top: 25px;
+            }
+        }
+    }
+}
+.banner {
+    position: relative;
+    height: 328px;
+    width: 100%;
+    max-width: 100%;
+    background: #336bff;
+    overflow: hidden;
+    .b-l {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 328px;
+        width: 360px;
+        background: url(../../assets/image/banner-l.png);
+        z-index: 1;
+    }
+    .b-c {
+        position: relative;
+        height: inherit;
+        width: @mainWidth;
+        margin: auto;
+        background: url(../../assets/image/banner-c.png);
+    }
+    .b-c:after {
+        content: '';
+        position: absolute;
+        width: 257px;
+        height: 257px;
+        left: 223px;
+        top: 33px;
+        background: url(../../assets/image/banner-rotate.png) no-repeat;
+        animation: rotate linear 3500ms infinite;
+    }
+    .b-r {
+        position: absolute;
+        top: 0;
+        right: 0;
+        height: 328px;
+        width: 360px;
+        background: url(../../assets/image/banner-r.png);
+    }
+}
+
+.main-box {
+    width: 1200px;
+    margin: auto;
+}
+
+footer.ft {
+    background-color: #ececec;
+    color: #919191;
+    display: block;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+	    transform: rotate(360deg);
+    }
+}
+.validator-modal {
+    .ant-form label {
+        font-size: 16px;
+    }
+}
+.step-header {
+    text-align: center;
+    margin-top: 15px;
+    h1 {
+        color:#404040;
+        margin-bottom: 24px;
+        font-size: 32px;
+        font-weight: bold;
+    }
+    p {
+        font-size: 14px;
+        color:#5a5a5a;
+    }
+}
+.ant-steps-item-process .ant-steps-item-icon {
+    background: #336aff;
+    border-color: #336aff;
+    color: #fff;
+}
+
+.ant-modal-footer {
+    .ant-btn {
+        line-height: 32px;
+        height: 32px;
+    }
+}

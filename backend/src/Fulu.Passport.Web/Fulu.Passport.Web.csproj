@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IdentityServer4" Version="3.1.4" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.Extensions" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Fulu.AspNetCore\Fulu.AspNetCore.csproj" />
+    <ProjectReference Include="..\Fulu.Document\Fulu.Document.csproj" />
+    <ProjectReference Include="..\Fulu.Passport.Domain\Fulu.Passport.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

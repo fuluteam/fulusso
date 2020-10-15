@@ -1,0 +1,146 @@
+
+variables:
+  PROJECT_NAME: ich.passport.web
+  WEB_DOCKERFILE_PATH: ./src/Fulu.Passport.Web/Dockerfile
+  PROJECT_NAME_API: ich.passport.api
+  WEBAPI_DOCKERFILE_PATH: ./src/Fulu.Passport.API/Dockerfile
+
+stages:
+- build & test
+- deploy
+
+## 构建 & 单元测试
+
+build & test:
+  stage: build & test
+  image: microsoft/dotnet:2.1.301-sdk
+  script:
+    - dotnet build
+    - find ./test -type f -name *.Test.csproj -print0 | xargs -r -n 1 -0 dotnet test
+  only:
+    - /^feature\/[\S]+$/
+  except:
+    - tags
+
+## docker打包
+.deploy-docker: &deploy-docker
+  stage: deploy
+  image: registry.cn-hangzhou.aliyuncs.com/k8s-ich/deployer:latest
+  script:
+    - docker login -u ${DOCKER_REPOSTORY_USERNAME} -p ${DOCKER_REPOSTORY_PASSPORD} ${DOCKER_REPOSTORY_ADDRESSURL}
+    - docker build -f ${WEB_DOCKERFILE_PATH} -t ${WEB_IMAGE_URL} . 
+    - docker tag  ${WEB_IMAGE_URL} ${WEB_IMAGE_URL}
+    - docker push ${WEB_IMAGE_URL} 
+    - docker rmi -f ${WEB_IMAGE_URL}    
+
+    - docker login -u ${DOCKER_REPOSTORY_USERNAME} -p ${DOCKER_REPOSTORY_PASSPORD} ${DOCKER_REPOSTORY_ADDRESSURL}
+    - docker build -f ${WEBAPI_DOCKERFILE_PATH} -t ${WEBAPI_IMAGE_URL} . 
+    - docker tag  ${WEBAPI_IMAGE_URL} ${WEBAPI_IMAGE_URL}
+    - docker push ${WEBAPI_IMAGE_URL} 
+    - docker rmi -f ${WEBAPI_IMAGE_URL}    
+
+## 开发环境
+deploy-dev:
+  <<: *deploy-docker
+  variables:
+    DOCKER_REPOSTORY_USERNAME: $DEV_REGISTRY_USERNAME
+    DOCKER_REPOSTORY_PASSPORD: $DEV_REGISTRY_PASSWORD
+    DOCKER_REPOSTORY_ADDRESSURL: $DEV_REGISTRY
+    WEB_IMAGE_URL: $DEV_REGISTRY/${PROJECT_NAME}.webapi:Development-$CI_PIPELINE_ID
+    WEBAPI_IMAGE_URL: $DEV_REGISTRY/${PROJECT_NAME_API}.webapi:Development-$CI_PIPELINE_ID
+  only:
+    - develop
+  except:
+    - tags
+  environment:
+    name: Development
+  allow_failure: false
+
+
+## 测试环境
+deploy-test:
+  <<: *deploy-docker
+  variables:
+    DOCKER_REPOSTORY_USERNAME: $DEV_REGISTRY_USERNAME
+    DOCKER_REPOSTORY_PASSPORD: $DEV_REGISTRY_PASSWORD
+    DOCKER_REPOSTORY_ADDRESSURL: $DEV_REGISTRY
+    WEB_IMAGE_URL: $DEV_REGISTRY/${PROJECT_NAME}.webapi:Test-$CI_PIPELINE_ID
+    WEBAPI_IMAGE_URL: $DEV_REGISTRY/${PROJECT_NAME_API}.webapi:Test-$CI_PIPELINE_ID
+  only:
+    - /^release\/[\S]+$/
+  except:
+    - tags
+  environment:
+    name: Test
+  allow_failure: false
+
+
+## 压测环境
+deploy-perf:
+  <<: *deploy-docker
+  variables:
+    DOCKER_REPOSTORY_USERNAME: $DEV_REGISTRY_USERNAME
+    DOCKER_REPOSTORY_PASSPORD: $DEV_REGISTRY_PASSWORD
+    DOCKER_REPOSTORY_ADDRESSURL: $DEV_REGISTRY
+    WEB_IMAGE_URL: $DEV_REGISTRY/${PROJECT_NAME}.webapi:Perf-$CI_PIPELINE_ID
+    WEBAPI_IMAGE_URL: $DEV_REGISTRY/${PROJECT_NAME_API}.webapi:Perf-$CI_PIPELINE_ID
+  only:
+    - /^yace\/[\S]+$/
+  except:
+    - tags
+  environment:
+    name: Perf
+  allow_failure: false
+
+
+## 集成测试环境
+deploy-beta:
+  <<: *deploy-docker
+  variables:
+    DOCKER_REPOSTORY_USERNAME: $PROD_REGISTRY_USERNAME
+    DOCKER_REPOSTORY_PASSPORD: $PROD_REGISTRY_PASSWORD
+    DOCKER_REPOSTORY_ADDRESSURL: $PROD_REGISTRY
+    WEB_IMAGE_URL: $PROD_REGISTRY_REPO/${PROJECT_NAME}.webapi:Beta-$CI_PIPELINE_ID
+    WEBAPI_IMAGE_URL: $PROD_REGISTRY_REPO/${PROJECT_NAME_API}.webapi:Beta-$CI_PIPELINE_ID
+  only:
+    - /^beta\/[\S]+$/
+  except:
+    - tags
+  environment:
+    name: Beta
+  allow_failure: false
+
+
+## 预发布环境
+deploy-pre:
+  <<: *deploy-docker
+  variables:
+    DOCKER_REPOSTORY_USERNAME: $PROD_REGISTRY_USERNAME
+    DOCKER_REPOSTORY_PASSPORD: $PROD_REGISTRY_PASSWORD
+    DOCKER_REPOSTORY_ADDRESSURL: $PROD_REGISTRY
+    WEB_IMAGE_URL: $PROD_REGISTRY_REPO/${PROJECT_NAME}.webapi:Staging-$CI_PIPELINE_ID
+    WEBAPI_IMAGE_URL: $PROD_REGISTRY_REPO/${PROJECT_NAME_API}.webapi:Staging-$CI_PIPELINE_ID
+  only:
+    - master
+  except:
+    - tags
+  environment:
+    name: Staging
+  allow_failure: false
+
+
+## 生产环境
+#deploy-prod:
+#  <<: *deploy-docker
+#  variables:
+#    DOCKER_REPOSTORY_USERNAME: $PROD_REGISTRY_USERNAME
+#    DOCKER_REPOSTORY_PASSPORD: $PROD_REGISTRY_PASSWORD
+#    DOCKER_REPOSTORY_ADDRESSURL: $PROD_REGISTRY
+#    WEB_IMAGE_URL: $PROD_REGISTRY_REPO/${PROJECT_NAME}.webapi:Production-$CI_PIPELINE_ID
+#  only:
+#    - /^rel-[\S]+$/
+#  except:
+#    - branches
+#  environment:
+#    name: Production
+#  allow_failure: false
