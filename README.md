@@ -1,13 +1,13 @@
 # 开源项目葫芦藤sso前端项目
 目前包括：登录、注册、找回密码和用户中心四个页面，具体界面如下：
 
-<img src="./readme_assets/login.png">
+<img src="./frontend/readme_assets/login.png">
 
-<img src="./readme_assets/register.png">
+<img src="./frontend/readme_assets/register.png">
 
-<img src="./readme_assets/reset-ps.png">
+<img src="./frontend/readme_assets/reset-ps.png">
 
-<img src="./readme_assets/index.png">
+<img src="./frontend/readme_assets/index.png">
 
 ## 一.效果演示
 
