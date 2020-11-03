@@ -8,5 +8,7 @@
         public static readonly string LastLoginIp = "last_login_ip";
         public static readonly string LastLoginAddress = "last_login_address";
         public static readonly string BindingStatus = "binding_status";
+        public static readonly string ProviderKey = "provider_key";
+        public static readonly string LoginProvider = "login_provider";
     }
 }

@@ -10,15 +10,15 @@ namespace FuLu.Passport.Domain.Entities
     [Table("user")]
     public class UserEntity : IEntity
     {
-        [RedisKey("id", true)]
+        [RedisKey(PrefixName = "id",PrimaryKey = true)]
         [Column("id")]
         public string Id { get; set; }
-        [RedisKey("username")]
+        [RedisKey(PrefixName = "username")]
         [Column("username")]
         public string UserName { get; set; }
         [Column("nickname")]
         public string NickName { get; set; }
-        [RedisKey("phone")]
+        [RedisKey(PrefixName = "phone")]
         [Column("phone")]
         public string Phone { get; set; }
         [Column("gender")]

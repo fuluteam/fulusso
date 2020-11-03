@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Fulu.Passport.Domain.Component;
+using AutoMapper;
 using Fulu.Passport.Domain.Interface;
 using Fulu.Passport.Domain.Interface.Services;
 using Fulu.Passport.Domain.Models;
@@ -15,6 +15,7 @@ using FuLu.Passport.Domain.Options;
 using FuLu.Passport.Domain.Interface.Services;
 using Microsoft.AspNetCore.Http;
 using IdentityModel;
+using Fulu.WebAPI.Abstractions;
 
 namespace Fulu.Passport.API.Controllers
 {
@@ -23,25 +24,24 @@ namespace Fulu.Passport.API.Controllers
     /// </summary>
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class UserController : BaseController
+    [Authorize]
+    public class UserController : ControllerBase
     {
         private readonly AppSettings _appSettings;
         private readonly IEncryptService _encryptService;
-        private readonly IValidationComponent _smsComponent;
+        private readonly IValidationComponent _validationComponent;
         private readonly IUserService _userService;
+        private readonly IMapper _mapper;
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="encryptService"></param>
-        /// <param name="userService"></param>
-        /// <param name="appSettings"></param>
-        /// <param name="smsComponent"></param>
-        public UserController(IEncryptService encryptService, IUserService userService, AppSettings appSettings, IValidationComponent smsComponent)
+        public UserController(IEncryptService encryptService, IUserService userService, AppSettings appSettings, IValidationComponent validationComponent, IMapper mapper)
         {
             _encryptService = encryptService;
             _userService = userService;
             _appSettings = appSettings;
-            _smsComponent = smsComponent;
+            _validationComponent = validationComponent;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -49,33 +49,38 @@ namespace Fulu.Passport.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost, AllowAnonymous]
+        [ProducesResponseType(typeof(ActionObjectResult), 200)]
         public async Task<IActionResult> Register(RegisterInputDto inputDto)
         {
             var password = _encryptService.DecryptRsa(inputDto.Password);
 
             if (string.IsNullOrEmpty(password))
-                return Ok("-1", "密码格式不正确");
+                return ObjectResponse.Error("密码格式不正确");
 
             if (Regex.IsMatch(password, RegexConstance.IsPassword) == false)
             {
-                return Ok(password.Length < 6 ? ("20002", "密码长度不能少于6个字符") : ("20002", "密码长度不能超过20个字符"));
+                return ObjectResponse.Error(password.Length < 6 ? "密码长度不能少于6个字符" : "密码长度不能超过20个字符");
             }
 
             //验证验证码
-            var validResult = await _smsComponent.ValidSmsAsync(inputDto.Phone, inputDto.Code, ValidationType.Register);
+            var validResult = await _validationComponent.ValidSmsAsync(inputDto.Phone, inputDto.Code);
             if (!validResult.Data)
             {
-                return Ok(validResult.Code, validResult.Message);
+                return ObjectResponse.Ok(validResult.Code,validResult.Message);
             }
 
             if (await _userService.ExistPhoneAsync(inputDto.Phone))
-                return Ok("-1", "手机号已存在");
+                return ObjectResponse.Error("手机号已存在");
 
             var userEntity = await _userService.RegisterAsync(inputDto.Phone, password, _appSettings.ClientId, _appSettings.ClientName, HttpContext.GetIp(), inputDto.Nickname);
 
             var openId = MD5.Compute($"openId{_appSettings.ClientId}{userEntity.Id}");
 
-            return Ok(new { OpenId = openId ?? "", UserName = userEntity.UserName ?? "", NickName = userEntity.NickName ?? "", Phone = userEntity.Phone ?? "", Gender = userEntity.Gender, Email = userEntity.Email ?? "", FigureUrl = userEntity.FigureUrl ?? "" });
+            var registerOutput = _mapper.Map<RegisterOutputDto>(userEntity);
+
+            registerOutput.OpenId = openId;
+
+            return ObjectResponse.Ok(registerOutput);
         }
 
         /// <summary>
@@ -83,27 +88,28 @@ namespace Fulu.Passport.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost, AllowAnonymous]
+        [ProducesResponseType(typeof(ActionObjectResult<RegisterOutputDto>), 200)]
         public async Task<ActionResult> ResetPassword(ResetPasswordInputDto inputDto)
         {
             var password = _encryptService.DecryptRsa(inputDto.Password);
 
             if (string.IsNullOrEmpty(password))
-                return Ok("-1", "密码格式不正确");
+                return ObjectResponse.Error("密码格式不正确");
 
             if (Regex.IsMatch(password, RegexConstance.IsPassword) == false)
-                return Ok(password.Length < 6 ? ("20002", "密码长度不能少于6个字符") : ("20002", "密码长度不能超过20个字符"));
+                return ObjectResponse.Error(password.Length < 6 ? "密码长度不能少于6个字符" : "密码长度不能超过20个字符");
 
-            var cacheTicket = await _smsComponent.GetValidateTicketAsync(inputDto.Code);
-            if (cacheTicket == null)
-                return Ok(false, "-1", "验证无效或验证已超时");
+            var phone = await _validationComponent.GetTicketPhoneAsync(inputDto.Ticket);
+            if (string.IsNullOrWhiteSpace(phone))
+                return ObjectResponse.Error("身份验证无效或验证已过期");
 
-            var phoneExists = await _userService.ExistPhoneAsync(cacheTicket.Phone);
+            var phoneExists = await _userService.ExistPhoneAsync(phone);
             if (!phoneExists)
-                return Ok("-1", "该用户不存在");
+                return ObjectResponse.Error("该用户不存在");
 
-            await _userService.ResetPasswordAsync(cacheTicket.Phone, password);
+            await _userService.ResetPasswordAsync(phone, password);
 
-            return Ok("0", "ok");
+            return ObjectResponse.Ok();
         }
 
         /// <summary>
@@ -111,47 +117,90 @@ namespace Fulu.Passport.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost, AllowAnonymous]
+        [ProducesResponseType(typeof(ActionObjectResult<string>), 200)]
         public async Task<ActionResult> ResetPasswordValidate(ResetPasswordValidateInputDto inputDto)
         {
-            var validSms = await _smsComponent.ValidSmsAsync(inputDto.Phone, inputDto.Code, ValidationType.ResetPassword);
+            var validSms = await _validationComponent.ValidSmsAsync(inputDto.Phone, inputDto.Code);
 
             if (!validSms.Data)
-                return Ok(validSms);
+                return ObjectResponse.Ok(validSms.Code,validSms.Message);
 
             if (!await _userService.ExistPhoneAsync(inputDto.Phone))
-            {
-                return Ok("-1", "手机号不存在");
-            }
+                return ObjectResponse.Ok("手机号不存在");
 
-            var ticket = await _smsComponent.CreateTicketAsync(inputDto.Phone, ValidationType.ResetPassword);
+            var ticket = await _validationComponent.CreateTicketAsync(inputDto.Phone);
 
-            return Ok(ticket);
+            return ObjectResponse.Ok(data: ticket);
         }
 
+        /// <summary>
+        /// 身份验证
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost, AllowAnonymous]
+        [ProducesResponseType(typeof(ActionObjectResult<string>), 200)]
+        public async Task<IActionResult> ValidateIdentity(IdentityValidateInputDto inputDto)
+        {
+            var validSms = await _validationComponent.ValidSmsAsync(inputDto.Phone, inputDto.Code);
+
+            if (!validSms.Data)
+                return ObjectResponse.Ok(validSms.Code,validSms.Message);
+
+            if (!await _userService.ExistPhoneAsync(inputDto.Phone))
+                return ObjectResponse.Error("手机号不存在");
+
+            var ticket = await _validationComponent.CreateTicketAsync(inputDto.Phone);
+
+            return ObjectResponse.Ok(data: ticket);
+        }
 
         /// <summary>
         /// 获取用户信息
         /// </summary>
         /// <returns></returns>
         [HttpGet, Authorize]
+        [ProducesResponseType(typeof(ActionObjectResult<GetUserInfoOutput>), 200)]
         public async Task<ActionResult> GetUserInfo()
         {
-            var account = await _userService.GetUserByPhoneAsync(User.GetPhoneNo());
+            var userEntity = await _userService.GetUserByPhoneAsync(User.GetPhoneNo());
 
-            var nickName = account.NickName;
-            var userId = account.Id;
+            var nickName = userEntity.NickName;
+            var userId = userEntity.Id;
             var openId = User.GetOpenId();
-            var phone = account.Phone;
-            phone = Regex.Replace(phone, "(\\d{3})\\d{4}(\\d{4})", "$1****$2");
-            return Ok(new
+            var phone = Regex.Replace(userEntity.Phone, "(\\d{3})\\d{4}(\\d{4})", "$1****$2");
+
+            var userInfoOutput = new GetUserInfoOutput
             {
-                userid = userId,
-                openid = openId,
-                nickname = nickName,
-                cellphone = phone
-            });
+                UserId = userId,
+                OpenId = openId,
+                NickName = nickName,
+                Phone = phone
+            };
+            return ObjectResponse.Ok(userInfoOutput);
         }
 
+        /// <summary>
+        /// 修改手机号
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost, AllowAnonymous]
+        [ProducesResponseType(typeof(ActionObjectResult), 200)]
+        public async Task<ActionResult> ChangePhone(ChangePhoneInputDto inputDto)
+        {
+            var phone = await _validationComponent.GetTicketPhoneAsync(inputDto.Code);
+            if (string.IsNullOrWhiteSpace(phone))
+                return ObjectResponse.Error("身份验证无效或验证已过期");
 
+            if (inputDto.Phone == phone)
+                return ObjectResponse.Error("输入手机号与原手机号相同");
+
+            var dataContent = await _validationComponent.ValidSmsAsync(inputDto.Phone, inputDto.Code);
+
+            if (!dataContent.Data)
+                return ObjectResponse.Ok(dataContent.Code, dataContent.Message);
+
+            var result = await _userService.ChangePhoneAsync(phone, inputDto.Phone);
+            return ObjectResponse.Ok(result);
+        }
     }
 }

@@ -84,7 +84,7 @@ namespace Fulu.Passport.API
 
             if (!Env.IsProduction())
             {
-                foreach (System.Collections.Generic.KeyValuePair<string, string> item in Configuration.AsEnumerable())
+                foreach (KeyValuePair<string, string> item in Configuration.AsEnumerable())
                 {
                     Console.WriteLine($"{item.Key} : {item.Value}");
                 }

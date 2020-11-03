@@ -14,7 +14,7 @@ namespace Fulu.Passport.API.Controllers
     /// </summary>
     [Route("api/authorization_code")]
     [ApiController]
-    public class AuthorizationCodeController : BaseController
+    public class AuthorizationCodeController : ControllerBase
     {
         private readonly IAuthorizeTokenClient _authorizeClient;
         /// <summary>
@@ -31,10 +31,10 @@ namespace Fulu.Passport.API.Controllers
         /// </summary>
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Post([FromBody] AuthorizationCodeModel data)
+        public async Task<IActionResult> Post([FromBody]AuthorizationCodeModel data)
         {
             var (error, result) = await _authorizeClient.GetToken(data.Code, data.State, data.RedirectUri);
-            return !string.IsNullOrEmpty(error) ? Ok("-1", error) : Ok(result);
+            return !string.IsNullOrEmpty(error) ? ObjectResponse.Ok(-1, error) : ObjectResponse.Ok(result);
         }
 
     }

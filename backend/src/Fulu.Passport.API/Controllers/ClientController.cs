@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using Fulu.Core.Extensions;
 using FuLu.Passport.Domain.Entities;
 using Fulu.Passport.Domain.Interface.Repositories;
 using FuLu.Passport.Domain.Interface.Repositories;
@@ -18,8 +20,8 @@ namespace Fulu.Passport.API.Controllers
     /// client
     /// </summary>
     [Route("api/[controller]/[action]")]
-    [ApiController, Authorize]
-    public class ClientController : BaseController
+    [ApiController, Authorize(Roles = ClaimRoles.Client)]
+    public class ClientController : ControllerBase
     {
         private readonly IMapper _mapper;
         private readonly IClientRepository _clientRepository;
@@ -37,11 +39,11 @@ namespace Fulu.Passport.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [ProducesResponseType(typeof(ListContent<GetClientOutput>), 200)]
+        [ProducesResponseType(typeof(ActionObjectResult<List<ClientEntity>, Statistic>), 200)]
         public async Task<IActionResult> GetClients()
         {
             var clients = await _clientRepository.TableNoTracking.Where(c => c.Enabled).ToListAsync();
-            return Ok(clients);
+            return ObjectResponse.Ok(clients);
         }
 
         /// <summary>
@@ -49,7 +51,7 @@ namespace Fulu.Passport.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [ProducesResponseType(typeof(DataContent<bool>), 200)]
+        [ProducesResponseType(typeof(ActionObjectResult), 200)]
         public async Task<IActionResult> Create([FromBody] ModifyClientInputDto input)
         {
             var clientEntity = _mapper.Map<ClientEntity>(input);
@@ -60,8 +62,7 @@ namespace Fulu.Passport.API.Controllers
             await _unitOfWork.SaveChangesAsync();
 
             await _clientInCacheRepository.ClearCacheByIdAsync(clientEntity.ClientId);
-
-            return Ok("0", "ok");
+            return ObjectResponse.Ok();
         }
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace Fulu.Passport.API.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut("{id}")]
-        [ProducesResponseType(typeof(DataContent<bool>), 200)]
+        [ProducesResponseType(typeof(ActionObjectResult), 200)]
         public async Task<IActionResult> Update(string id, [FromBody] ModifyClientInputDto input)
         {
             var clientEntity = await _clientRepository.Table.FirstOrDefaultAsync(c => c.Id == id);
@@ -82,7 +83,7 @@ namespace Fulu.Passport.API.Controllers
                 await _clientInCacheRepository.ClearCacheByIdAsync(clientEntity.ClientId);
             }
 
-            return Ok("0", "ok");
+            return ObjectResponse.Ok();
         }
 
     }

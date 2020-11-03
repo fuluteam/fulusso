@@ -1,12 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using IdentityServer4.Models;
+﻿using System.Threading.Tasks;
+using Fulu.Core.Extensions;
 using FuLu.Passport.Domain.Interface.Services;
 using FuLu.Passport.Domain.Models;
+using IdentityServer4.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace IdentityServer4.Validation
 {
@@ -23,10 +20,10 @@ namespace IdentityServer4.Validation
         public async Task ValidateAsync(ResourceOwnerPasswordValidationContext context)
         {
             var result = await _userService.LoginByPasswordAsync(context.UserName, context.Password);
-            if (result.Code == "0")
+            if (result.Code == 0)
             {
-                var clientId = int.Parse(context.Request.ClientId);
-                var claims = await _userService.GetLoginClaims(result.Data, clientId, _contextAccessor.HttpContext.GetIp(), UserLoginModel.Interface);
+                var claims = await _userService.SaveSuccessLoginInfo(context.Request.ClientId.ToInt32(), result.Data.Id,
+                    _contextAccessor.HttpContext.GetIp(), UserLoginModel.Password);
                 context.Result = new GrantValidationResult(context.UserName, "custom", claims);
             }
             else

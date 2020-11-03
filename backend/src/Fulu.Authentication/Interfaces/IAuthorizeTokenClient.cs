@@ -12,7 +12,7 @@ namespace Fulu.Authentication
         /// <param name="method"></param>
         /// <param name="authorization"></param>
         /// <returns></returns>
-        Task<DataContent<GrantInfoModel>> GetGrantInfo(string method, string authorization);
+        Task<ActionObjectResult<GrantInfoModel>> GetGrantInfo(string method, string authorization);
 
         /// <summary>
         /// 授权码模式（前端收到授权码，附上早先的"重定向URI"，向通行证服务器申请令牌（由后端服务器转发组装请求，对用户不可见））。

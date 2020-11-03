@@ -1,28 +1,29 @@
-﻿using Fulu.AutoDI;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using Fulu.AutoDI;
 using FuLu.IdentityServer.Stores;
+using Fulu.Passport.Domain;
+using Fulu.Passport.Domain.Interface;
+using FuLu.Passport.Domain.Interface;
+using Fulu.Passport.Domain.Options;
+using FuLu.Passport.Domain.Options;
+using Fulu.Passport.Domain.Services;
+using Fulu.Passport.Web.Validator;
 using IdentityServer4.Configuration;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using IdentityServer4.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using StackExchange.Redis;
-using System;
-using Microsoft.AspNetCore.HttpOverrides;
-using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using Org.BouncyCastle.Utilities.Encoders;
-using FuLu.Passport.Domain.Options;
-using FuLu.Passport.Domain.Interface;
-using Fulu.Passport.Domain.Services;
-using Fulu.Passport.Domain;
-using System.Text;
-using Fulu.Passport.Domain.Options;
-using Fulu.Passport.Domain.Interface;
+using StackExchange.Redis;
 
 namespace FuLu.IdentityServer
 {
@@ -78,7 +79,7 @@ namespace FuLu.IdentityServer
 
             if (!Env.IsProduction())
             {
-                foreach (System.Collections.Generic.KeyValuePair<string, string> item in Configuration.AsEnumerable())
+                foreach (KeyValuePair<string, string> item in Configuration.AsEnumerable())
                 {
                     Console.WriteLine($"{item.Key} : {item.Value}");
                 }
@@ -151,10 +152,24 @@ namespace FuLu.IdentityServer
             identityServerBuilder.AddResourceOwnerValidator<ResourceOwnerPasswordValidator>();
             identityServerBuilder.AddRedirectUriValidator<RedirectUriValidator>();
             identityServerBuilder.AddCustomAuthorizeRequestValidator<CustomAuthorizeRequestValidator>();
-            identityServerBuilder.Services.AddScoped<IUserSession, UserSession>();
+            identityServerBuilder.AddExtensionGrantValidator<SmsGrantValidator>();
+            identityServerBuilder.AddExtensionGrantValidator<ExternalGrantValidator>();
+            identityServerBuilder.Services.AddScoped<IUserSession, IdentityServer4.Services.FuluUserSession>();
 
             services.AddTransient<IHandleGenerationService, CustomHandleGenerationService>();
             services.AddTransient<IAuthorizationCodeStore, AuthorizationCodeStore>();
+
+            identityServerBuilder.AddDingTalk(opt =>
+            {
+                opt.AppId = Configuration["ExternalDingTalk:AppId"];
+                opt.Secret = Configuration["ExternalDingTalk:Secret"];
+            });
+
+            identityServerBuilder.AddWechat(opt =>
+            {
+                opt.AppId = Configuration["ExternalWeChat:AppId"];
+                opt.Secret = Configuration["ExternalWeChat:Secret"];
+            });
         }
 
         /// <summary>

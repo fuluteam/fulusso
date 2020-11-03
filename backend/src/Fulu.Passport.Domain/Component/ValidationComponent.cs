@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Fulu.Passport.Domain.Entities;
 using Fulu.Passport.Domain.Interface;
-using FuLu.Passport.Domain.Interface;
 using Fulu.Passport.Domain.Interface.Repositories;
 using Fulu.Passport.Domain.Models;
 using Fulu.Passport.Domain.Options;
@@ -12,7 +11,6 @@ using FuLu.Passport.Domain.Options;
 using Fulu.WebAPI.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Redis;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ICH.TransferJob;
 
@@ -21,7 +19,7 @@ namespace Fulu.Passport.Domain.Component
     /// <summary>
     /// 
     /// </summary>
-    public class ValidationComponent : ResultBase, IValidationComponent
+    public class ValidationComponent : IValidationComponent
     {
         private readonly IRedisCache _redisCache;
         private readonly SmsOptions _smsServerOptions;
@@ -45,30 +43,19 @@ namespace Fulu.Passport.Domain.Component
             _smsServerOptions = smsOptions.Value;
         }
 
-        private static string GetSmsKey(string phone, ValidationType type)
+        private static string GetSmsKey(string phone)
         {
-            return $"{(int)type}_{phone}";
+            return $"sms_{phone}";
         }
 
-        private static string GetTicketKey(string phone, ValidationType type)
+        private static string GetTicketKey(string ticket)
         {
-            return $"ticket_{(int)type}_{phone}";
+            return $"ticket:{ticket}";
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="appId"></param>
-        /// <param name="content"></param>
-        /// <param name="type"></param>
-        /// <param name="phone"></param>
-        /// <param name="ip"></param>
-        /// <param name="isSuccess"></param>
-        /// <param name="code"></param>
-        /// <param name="expiresMinute"></param>
-        /// <param name="smsMsgId"></param>
-        /// <param name="smsMsg"></param>
-        /// <returns></returns>
         public async Task SaveLog(int appId, string content, ValidationType type, string phone, string ip,
             bool isSuccess, string code, int expiresMinute, string smsMsgId, string smsMsg)
         {
@@ -92,40 +79,36 @@ namespace Fulu.Passport.Domain.Component
         /// </summary>
         /// <param name="phone"></param>
         /// <param name="code"></param>
-        /// <param name="type"></param>
         /// <returns></returns>
-        public async Task<DataContent<bool>> ValidSmsAsync(string phone, string code, ValidationType type)
+        public async Task<ActionObjectResult<bool>> ValidSmsAsync(string phone, string code)
         {
-            var uniqueKey = GetSmsKey(phone, type);
+            var uniqueKey = GetSmsKey(phone);
             var smsCache = await _redisCache.GetAsync<SmsCache>(uniqueKey);
 
             if (smsCache == null)
-                return Ok(false, "-1", "未发送验证码或验证码已超时");
+                return ActionObject.Ok(false, -1, "未发送验证码或验证码已超时");
 
             if (smsCache.ValidateCount >= 3)  //0 1  2
-                return Ok(false, "-1", "输入错误的次数超过3次，请重新获取验证码");
+                return ActionObject.Ok(false, -1, "输入错误的次数超过3次，请重新获取验证码");
             if (code == smsCache.Code)
             {
                 await _redisCache.KeyDeleteAsync(uniqueKey);
-                return Ok(true);
+                return ActionObject.Ok(true);
             }
 
             var timeSpan = smsCache.StartTime.AddMinutes(smsCache.ExpiresMinute) - DateTime.Now;
             if (timeSpan.TotalSeconds <= 0)
-                return Ok(false, "-1", "未发送验证码或验证码已超时");
+                return ActionObject.Ok(false, -1, "未发送验证码或验证码已超时");
             smsCache.ValidateCount += 1;   //更新验证次数，不延长时间  
             await _redisCache.AddAsync(uniqueKey, smsCache, timeSpan);
-            return Ok(false, "-1", "输入验证码不正确");
+            return ActionObject.Ok(false, -1, "输入验证码不正确");
         }
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="phone"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public async Task ClearSession(string phone, ValidationType type)
+        public async Task ClearSession(string phone)
         {
-            var uniqueKey = GetSmsKey(phone, type);
+            var uniqueKey = GetSmsKey(phone);
             await _redisCache.KeyDeleteAsync(uniqueKey);
         }
         /// <summary>
@@ -149,7 +132,6 @@ namespace Fulu.Passport.Domain.Component
         /// <returns></returns>
         public SmsContent GetSmsContent(ValidationType type, int expiresMinute = 5)
         {
-       
             var code = new Random(Guid.NewGuid().GetHashCode()).Next(100000, 999999);
 
             if (_appSettings.DeveloperMode)
@@ -195,7 +177,7 @@ namespace Fulu.Passport.Domain.Component
         /// <param name="type"></param>
         /// <param name="ip"></param>
         /// <returns></returns>
-        public async Task<DataContent<bool>> SendAsync(int appId, string phone, ValidationType type, string ip)
+        public async Task<ActionObjectResult<bool>> SendAsync(int appId, string phone, ValidationType type, string ip)
         {
             var smsModel = GetSmsContent(type);
             return await SendAsync(phone, smsModel.Code, appId, smsModel.Content, smsModel.ValidationType, ip, smsModel.ExpiresMinute);
@@ -204,11 +186,10 @@ namespace Fulu.Passport.Domain.Component
         /// 
         /// </summary>
         /// <param name="phone"></param>
-        /// <param name="type"></param>
         /// <returns></returns>
-        public async Task<bool> CheckOverLimit(string phone, ValidationType type)
+        public async Task<bool> CheckOverLimit(string phone)
         {
-            var uniqueKey = GetSmsKey(phone, type);
+            var uniqueKey = GetSmsKey(phone);
             var smsLimit = await _redisCache.GetAsync<SmsCache>(uniqueKey);
             return smsLimit == null || DateTime.Now.AddSeconds(-30) >= smsLimit.StartTime;
         }
@@ -216,20 +197,12 @@ namespace Fulu.Passport.Domain.Component
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="phone"></param>
-        /// <param name="smsCode"></param>
-        /// <param name="appId"></param>
-        /// <param name="content"></param>
-        /// <param name="type"></param>
-        /// <param name="ip"></param>
-        /// <param name="expiresMinute"></param>
-        /// <returns></returns>
-        public async Task<DataContent<bool>> SendAsync(string phone, string smsCode, int appId, string content, ValidationType type, string ip, int expiresMinute = 5)
+        public async Task<ActionObjectResult<bool>> SendAsync(string phone, string smsCode, int appId, string content, ValidationType type, string ip, int expiresMinute = 5)
         {
-            var uniqueKey = GetSmsKey(phone, type);
+            var uniqueKey = GetSmsKey(phone);
 
-            if (!await CheckOverLimit(phone, type))
-                return Ok(false, "-1", "请求频率过高，请稍后再试");
+            if (!await CheckOverLimit(phone))
+                return ActionObject.Ok(false, -1, "请求频率过高，请稍后再试");
 
             var smsLimit = new SmsCache { Code = smsCode, StartTime = DateTime.Now, ValidateCount = 0, ExpiresMinute = expiresMinute };
 
@@ -243,31 +216,27 @@ namespace Fulu.Passport.Domain.Component
                     x.SaveLog(appId, content, type, phone, ip, code == "0", smsCode, expiresMinute, msgId, msg));
             }
 
-            return Ok(true);
+            return ActionObject.Ok(true);
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="phone"></param>
-        /// <param name="type"></param>
         /// <returns></returns>
-        public async Task<string> CreateTicketAsync(string phone, ValidationType type)
+        public async Task<string> CreateTicketAsync(string phone)
         {
             var ticket = Guid.NewGuid().ToString("N");
-            var validationTicket = new ValidationTicket { Phone = phone, ValidationType = (int)type };
-            await _redisCache.AddAsync(ticket, validationTicket, TimeSpan.FromMinutes(15));
+            await _redisCache.AddAsync(GetTicketKey(ticket), phone, TimeSpan.FromMinutes(5));
             return ticket;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="ticket"></param>
-        /// <returns></returns>
-        public Task<ValidationTicket> GetValidateTicketAsync(string ticket)
+        public Task<string> GetTicketPhoneAsync(string ticket)
         {
-            return _redisCache.GetAsync<ValidationTicket>(ticket);
+            return _redisCache.GetAsync<string>(GetTicketKey(ticket));
         }
 
     }

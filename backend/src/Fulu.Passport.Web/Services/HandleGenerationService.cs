@@ -1,8 +1,5 @@
-﻿using IdentityModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using IdentityModel;
 
 namespace IdentityServer4.Services
 {

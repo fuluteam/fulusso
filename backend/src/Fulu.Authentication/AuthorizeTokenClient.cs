@@ -26,7 +26,7 @@ namespace Fulu.Authentication
         /// <summary>
         /// 
         /// </summary>
-        public async Task<DataContent<GrantInfoModel>> GetGrantInfo(string method, string authorization)
+        public async Task<ActionObjectResult<GrantInfoModel>> GetGrantInfo(string method, string authorization)
         {
             using (var httpRequest = new HttpRequestMessage(HttpMethod.Get, $"/api/apiauth/grantinfo/{_options.ClientId}/{method}"))
             {
@@ -39,12 +39,12 @@ namespace Fulu.Authentication
 
                     try
                     {
-                        var data = JsonConvert.DeserializeObject<DataContent<GrantInfoModel>>(msg);
+                        var data = JsonConvert.DeserializeObject<ActionObjectResult<GrantInfoModel>>(msg);
                         return data;
                     }
                     catch (JsonSerializationException ex)
                     {
-                        return (new DataContent<GrantInfoModel>("-1", ex.Message));
+                        return (ActionObject.Ok<GrantInfoModel>(-1,ex.Message));
                     }
                 }
             }

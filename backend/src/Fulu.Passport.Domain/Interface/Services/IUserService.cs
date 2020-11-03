@@ -15,6 +15,7 @@ namespace FuLu.Passport.Domain.Interface.Services
     /// </summary>
     public interface IUserService : IScopedAutoDIable
     {
+        Task<UserEntity> GetUserByIdAsync(string userId);
         /// <summary>
         /// 
         /// </summary>
@@ -50,7 +51,13 @@ namespace FuLu.Passport.Domain.Interface.Services
         /// 更换手机号
         /// </summary>
         /// <returns></returns>
-        Task<(string msg, string code)> ChangePhoneAsync(string phone, string newPhone);
+        Task<ActionObjectResult> ChangePhoneAsync(string phone, string newPhone);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        Task<IEnumerable<Claim>>
+            SaveSuccessLoginInfo(int clientId, string userId, string ip, UserLoginModel loginModel);
 
         /// <summary>
         /// 
@@ -58,17 +65,17 @@ namespace FuLu.Passport.Domain.Interface.Services
         /// <param name="userId"></param>
         /// <returns></returns>
         Task SaveErrorLoginInfo(string userId);
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="userEntity"></param>
-        /// <param name="clientId"></param>
-        /// <param name="loginIp"></param>
-        /// <param name="loginModel"></param>
+        IEnumerable<Claim> GetLoginClaims(UserEntity userEntity, int clientId);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="phone"></param>
+        /// <param name="password"></param>
         /// <returns></returns>
-        Task<IEnumerable<Claim>> GetLoginClaims(UserEntity userEntity, int clientId, string loginIp,
-            UserLoginModel loginModel);
-
-        Task<DataContent<UserEntity>> LoginByPasswordAsync(string phone, string password);
+        Task<ActionObjectResult<UserEntity>> LoginByPasswordAsync(string phone, string password);
     }
 }

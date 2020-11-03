@@ -17,19 +17,16 @@ namespace Fulu.Passport.Domain.Interface
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="phone"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        Task<bool> CheckOverLimit(string phone, ValidationType type);
+        Task<bool> CheckOverLimit(string phone);
         /// <summary>
         /// 
         /// </summary>
-        Task<DataContent<bool>> ValidSmsAsync(string phone, string code, ValidationType type);
+        Task<ActionObjectResult<bool>> ValidSmsAsync(string phone, string code);
 
         /// <summary>
         /// 
         /// </summary>
-        Task ClearSession(string phone, ValidationType type);
+        Task ClearSession(string phone);
 
         /// <summary>
         /// 
@@ -70,25 +67,24 @@ namespace Fulu.Passport.Domain.Interface
         /// <param name="type"></param>
         /// <param name="ip"></param>
         /// <returns></returns>
-        Task<DataContent<bool>> SendAsync(int appId, string phone, ValidationType type, string ip);
+        Task<ActionObjectResult<bool>> SendAsync(int appId, string phone, ValidationType type, string ip);
 
         /// <summary>
         /// 发送内容信息
         /// </summary>
-        Task<DataContent<bool>> SendAsync(string phone, string code, int appId, string content, ValidationType type, string ip, int expiresMinute = 5);
+        Task<ActionObjectResult<bool>> SendAsync(string phone, string code, int appId, string content, ValidationType type, string ip, int expiresMinute = 5);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="phone"></param>
-        /// <param name="type"></param>
         /// <returns></returns>
-        Task<string> CreateTicketAsync(string phone, ValidationType type);
+        Task<string> CreateTicketAsync(string phone);
         /// <summary>
         /// 
         /// </summary>
         /// <param name="ticket"></param>
         /// <returns></returns>
-        Task<ValidationTicket> GetValidateTicketAsync(string ticket);
+        Task<string> GetTicketPhoneAsync(string ticket);
 
     }
 }

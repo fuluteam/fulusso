@@ -1,11 +1,9 @@
-﻿using IdentityServer4.Configuration;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
+using IdentityServer4.Configuration;
+using Microsoft.AspNetCore.Http;
 
 namespace FuLu.IdentityServer
 {

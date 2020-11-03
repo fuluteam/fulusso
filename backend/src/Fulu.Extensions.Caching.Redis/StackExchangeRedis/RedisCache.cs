@@ -1169,7 +1169,7 @@ namespace Microsoft.Extensions.Caching.Redis
             if (properties == null || !properties.Any())
                 throw new KeyNotFoundException(nameof(t));
 
-            var mainProp = properties.FirstOrDefault(c => c.MainKey);
+            var mainProp = properties.FirstOrDefault(c => c.PrimaryKey);
 
             if (mainProp == null)
                 throw new KeyNotFoundException($"{nameof(T)}，the main key attribute is not found");
@@ -1177,12 +1177,12 @@ namespace Microsoft.Extensions.Caching.Redis
             foreach (var property in properties)
             {
                 var objValue = property.Get(t);
-             
+
                 if (objValue is null) continue;
 
-                var key = $"{property.FieldName}:{objValue}";
+                var key = $"{property.PrefixName}:{objValue}";
 
-                if (property.MainKey)
+                if (property.PrimaryKey)
                 {
                     return await GetAsync<T>(key, token: token);
                 }
@@ -1212,22 +1212,31 @@ namespace Microsoft.Extensions.Caching.Redis
 
             var keyPairs = new List<KeyValuePair<RedisKey, RedisValue>>();
 
-            var mainProp = properties.FirstOrDefault(c => c.MainKey);
+            var mainProp = properties.FirstOrDefault(c => c.PrimaryKey);
 
             if (mainProp == null)
                 throw new KeyNotFoundException($"{nameof(T)}，the main key is not found");
 
-            var mainKey = $"{mainProp.FieldName}:{mainProp.Get(t)}";
+            var mainPropValue = mainProp.Get(t)?.ToString();
+            var mainPrefixName = string.IsNullOrWhiteSpace(mainProp.PrefixName)
+                ? mainProp.PropertyName.ToLower() : mainProp.PrefixName;
 
-            if (string.IsNullOrEmpty(mainKey))
-                throw new ArgumentNullException($"{nameof(T)}，the main key is not null");
+            var mainKey = $"{mainPrefixName}:{mainPropValue}";
+
+            if (string.IsNullOrEmpty(mainPropValue))
+                throw new ArgumentNullException($"{nameof(T)}，the key value is not null");
 
             keyPairs.Add(new KeyValuePair<RedisKey, RedisValue>(GetKeyForRedis(mainKey), JsonConvert.SerializeObject(t)));
 
-            foreach (var property in properties.Where(c => !c.MainKey))
+            foreach (var property in properties.Where(c => !c.PrimaryKey))
             {
-                var key = $"{property.FieldName}:{property.Get(t)}";
-                keyPairs.Add(new KeyValuePair<RedisKey, RedisValue>(GetKeyForRedis(key),mainKey));
+                var propValue = property.Get(t)?.ToString();
+                var prefixName = string.IsNullOrWhiteSpace(property.PrefixName) ? property.PropertyName.ToLower() : property.PrefixName;
+
+                if (string.IsNullOrWhiteSpace(propValue)) continue;
+
+                var key = $"{prefixName}:{propValue}";
+                keyPairs.Add(new KeyValuePair<RedisKey, RedisValue>(GetKeyForRedis(key), mainKey));
             }
 
             var transaction = _cache.CreateTransaction();
@@ -1254,7 +1263,7 @@ namespace Microsoft.Extensions.Caching.Redis
             var keys = new List<string>();
             foreach (var property in properties)
             {
-                var key = $"{property.FieldName}:{property.Get(t)}";
+                var key = $"{property.PrefixName}:{property.Get(t)}";
                 keys.Add(key);
             }
             var array = (from string key in keys select (RedisKey)GetKeyForRedis(key)).ToArray();

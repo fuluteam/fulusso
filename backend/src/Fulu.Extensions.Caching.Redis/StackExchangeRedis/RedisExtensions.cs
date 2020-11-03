@@ -147,8 +147,8 @@ namespace Microsoft.Extensions.Caching.Redis
                     PropertyInfo = propertyInfo,
                     PropertyName = propertyInfo.Name,
                     GetMethod = propertyInfo.CreateGetter(),
-                    MainKey = attr.MainKey,
-                    FieldName = attr.FieldName
+                    PrimaryKey = attr.PrimaryKey,
+                    PrefixName = attr.PrefixName
                 };
                 list.Add(temp);
             }

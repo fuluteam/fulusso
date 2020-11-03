@@ -1,9 +1,7 @@
-﻿using IdentityServer4.Models;
-using IdentityServer4.Validation;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServer4.Models;
 
 namespace IdentityServer4.Validation
 {

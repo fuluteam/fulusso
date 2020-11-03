@@ -12,9 +12,8 @@ namespace Microsoft.Extensions.Caching.Redis
 
         public string PropertyName { get; set; }
 
-        public bool MainKey { get; set; }
-
-        public string FieldName { get; set; }
+        public string PrefixName { get; set; }
+        public bool PrimaryKey { get; set; }
 
         public IGetValue GetMethod { get; set; }
         public object Get(object obj)

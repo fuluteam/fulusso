@@ -8,7 +8,7 @@ namespace Fulu.Passport.Domain.Models
     public class ResetPasswordInputDto
     {
         [Required]
-        public string Code { get; set; }
+        public string Ticket { get; set; }
         [Required]
         public string Password { get; set; }
     }

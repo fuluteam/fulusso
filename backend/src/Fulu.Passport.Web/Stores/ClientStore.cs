@@ -1,9 +1,8 @@
-﻿using System;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading.Tasks;
 using Fulu.Core.Extensions;
-using Fulu.Passport.Domain.Interface.Repositories;
 using FuLu.IdentityServer.Stores;
+using Fulu.Passport.Domain.Interface.Repositories;
 using IdentityModel;
 using IdentityServer4.Models;
 
@@ -34,7 +33,9 @@ namespace IdentityServer4.Stores
                 {
                     GrantType.AuthorizationCode,
                     GrantType.ClientCredentials,
-                    GrantType.ResourceOwnerPassword
+                    GrantType.ResourceOwnerPassword,
+                    CustomGrantType.External,
+                    CustomGrantType.Sms
                 },
                 AllowOfflineAccess = false,
                 RedirectUris = string.IsNullOrWhiteSpace(clientEntity.RedirectUri) ? null : clientEntity.RedirectUri.Split(';'),

@@ -2,10 +2,10 @@
 using System;
 using System.Threading.Tasks;
 using System.Linq;
-using Fulu.WebAPI.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using IdentityModel;
 using Fulu.Authentication;
+using Fulu.WebAPI.Abstractions;
 
 namespace Microsoft.AspNetCore.Mvc.Filters
 {
@@ -52,22 +52,22 @@ namespace Microsoft.AspNetCore.Mvc.Filters
 
                     var grantInfoResponse = await _serviceAuthorizeHttpClient.GetGrantInfo(
                         method, authorization);
-                    if (grantInfoResponse.Code != "0")
+                    if (grantInfoResponse.Code != 0)
                     {
-                        context.Result = new BadRequestObjectResult(ResponseResult.Ok(grantInfoResponse.Code, grantInfoResponse.Message));
+                        context.Result = new BadRequestObjectResult(ActionObject.Ok(grantInfoResponse.Code, grantInfoResponse.Message));
                         return;
                     }
 
                     var grantInfo = grantInfoResponse.Data;
                     if (grantInfo == null)
                     {
-                        context.Result = new BadRequestObjectResult(ResponseResult.Ok("-1", "获取授权信息失败"));
+                        context.Result = new BadRequestObjectResult(ActionObject.Ok(-1, "获取授权信息失败"));
                         return;
                     }
 
                     if (!grantInfo.Granted)
                     {
-                        context.Result = new ObjectResult(ResponseResult.Ok("-1", "该资源需要appid拥有授权")) { StatusCode = 403 };
+                        context.Result = new ObjectResult(ActionObject.Ok(-1, "该资源需要appid拥有授权")) { StatusCode = 403 };
                         return;
                     }
                 }
