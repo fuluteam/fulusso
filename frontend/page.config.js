@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const pagesBathPath = path.resolve(__dirname, 'src/pages');
 
-const APP_NAME = '福禄通行证';
+const APP_NAME = '葫芦藤安全中心';
 
 const DEBUG = !process.argv.find((a) => {
     return a === '--mode=production';
@@ -15,6 +15,7 @@ const pageTitleMap = {
     login: '登录',
     register: '注册',
     resetPassword: '找回密码',
+    bindAccount: '用户绑定',
     index: '安全中心',
 };
 

@@ -10,7 +10,7 @@ class SendSmsButton extends React.Component {
             loading: false,
         };
         this.startLoop = this.startLoop.bind(this);
-        this.onSend = this.onSend.bind(this);
+        this.onBtnClick = this.onBtnClick.bind(this);
         this.secondCountDown = this.secondCountDown.bind(this);
         this.timer = null;
     }
@@ -41,6 +41,19 @@ class SendSmsButton extends React.Component {
             this.onTriggerSend();
         }
     }
+    onBtnClick() {
+        const { beforeSend } = this.props;
+        if (typeof beforeSend === 'function') {
+            beforeSend().then((result) => {
+                if (!result) {
+                    return;
+                }
+                this.onSend();
+            });
+            return;
+        }
+        this.onSend();
+    }
     componentWillUnmount() {
         if (this.timer) {
             clearTimeout(this.timer);
@@ -57,7 +70,7 @@ class SendSmsButton extends React.Component {
                     loading: false,
                 });
                 if (typeof result === 'object') {
-                    if (result.code === CODE_OK) {
+                    if (result.code == CODE_OK) {
                         message.success('发送成功');
                         this.startLoop();
                     } else if (showError) {
@@ -74,9 +87,7 @@ class SendSmsButton extends React.Component {
     startLoop() {
         this.setState({
             seconds: 60,
-        }, () => {
-            this.secondCountDown();
-        });
+        }, this.secondCountDown);
     }
     secondCountDown() {
         const { seconds } = this.state;
@@ -95,7 +106,7 @@ class SendSmsButton extends React.Component {
         const disabled = seconds >= 0;
         return (
             <Button
-                onClick={this.onSend}
+                onClick={this.onBtnClick}
                 disabled={disabled}
                 loading={loading}
                 className="btn-send-sms"

@@ -5,7 +5,7 @@ import model from 'core/Decorator';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
 import SendSmsButton from 'components/SendSmsButton';
-import ThirdPartyLogin from 'components/ThirdPartyLogin';
+import ThirdPartyLoginView from 'components/ThirdPartyLoginView';
 import ArrowRight from 'components/ArrowRight';
 import { toNavApp } from '../../utils/url';
 import CODE_OK from '../../utils/Constants';
@@ -202,7 +202,7 @@ class Login extends BaseView {
                                         <ArrowRight />
                                     </a>
                                 </div>
-                                <ThirdPartyLogin onLogin={this.onThirdPartyLogin} />
+                                <ThirdPartyLoginView />
                             </div>
                         </div>
                     </div>

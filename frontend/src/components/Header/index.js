@@ -9,7 +9,7 @@ const Header = ({ renderStatus, className }) => {
                     <div className="logo" />
                 </a>
                 {
-                    typeof renderStatus == 'function' && renderStatus()
+                    typeof renderStatus == 'function' ? renderStatus() : <a href="./index.html" className="nav-to-center">用户中心</a>
                 }
             </div>
         </header>

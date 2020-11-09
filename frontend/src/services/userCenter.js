@@ -10,7 +10,7 @@ export function fetchAccessToken(params) {
 }
 
 export function fetchThirdPartyBind() {
-    return axios.get(concatUrl('/api/User/GetBindList'));
+    return axios.get(concatUrl('/api/ExternalUser/GetUsers'));
 }
 
 export function fetchUserIp() {
@@ -22,11 +22,7 @@ export function sendSmsCode(params) {
 }
 
 export function unbindThirdParty(params) {
-    return axios.post(concatUrl('/api/User/Unbind'), params);
-}
-
-export function sendCodeToNewPhone(params) {
-    return axios.post(concatUrl('/api/SmsCode/Send'), params);
+    return axios.post(concatUrl('/api/ExternalUser/UnbindUser'), params);
 }
 
 export function signOut() {
@@ -59,8 +55,4 @@ export function unBindApp(params) {
 
 export function sendKey(params) {
     return axios.post(concatUrl('/api/QrCode/SendKey'), params);
-}
-
-export function changeValidateMode(params) {
-    return axios.post(concatUrl('/api/User/ChangeValidatePriority'), params);
 }

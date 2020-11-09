@@ -1,10 +1,10 @@
 import React, { Fragment } from 'react';
-import { Checkbox, Form, Input, Button, Tooltip, Icon } from 'antd';
+import { Form, Input, Button, Tooltip, Icon } from 'antd';
 import BaseView from 'core/BaseView';
 import model from 'core/Decorator';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
-import ThirdPartyLogin from 'components/ThirdPartyLogin';
+import ThirdPartyLoginView from 'components/ThirdPartyLoginView';
 import SendSmsButton from 'components/SendSmsButton';
 import SuccessNav from 'components/SuccessNav';
 import ArrowRight from 'components/ArrowRight';
@@ -66,7 +66,7 @@ class Register extends BaseView {
     renderForm() {
         const { register, form } = this.props;
         const { loading } = register;
-        const { getFieldDecorator, getFieldValue } = form;
+        const { getFieldDecorator } = form;
         return (
             <Fragment>
                 <div className="form-header">注册</div>
@@ -114,7 +114,7 @@ class Register extends BaseView {
                                 />
                             </Tooltip>
                         </Form.Item>
-                        <Form.Item className="register-rules-item">
+                        {/* <Form.Item className="register-rules-item">
                             {getFieldDecorator('isAgree')(
                                 <Checkbox className="agree-rules">
                                     我已阅读并同意
@@ -123,12 +123,15 @@ class Register extends BaseView {
                             <a className="link-rules">
                                 《福禄开放平台用户注册协议》
                             </a>
-                        </Form.Item>
+                        </Form.Item> */}
                         <Button
                             block
                             type="primary"
                             htmlType="submit"
-                            disabled={!getFieldValue('isAgree')}
+                            style={{
+                                marginTop: '25px',
+                            }}
+                            // disabled={!getFieldValue('isAgree')}
                             className="btn-form btn-register"
                             loading={loading}
                         >
@@ -147,7 +150,7 @@ class Register extends BaseView {
                            <ArrowRight />
                         </a>
                     </div>
-                    <ThirdPartyLogin onLogin={this.onThirdPartyLogin} />
+                    <ThirdPartyLoginView />
                 </div>
             </Fragment>
         );

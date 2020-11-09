@@ -24,6 +24,7 @@ class ResetPassword extends BaseView {
         this.onCancel = this.onCancel.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onSendSms = this.onSendSms.bind(this);
+        this.checkPhone = this.checkPhone.bind(this);
         this.onTogglePwdType = this.onTogglePwdType.bind(this);
         this.onCheckCodeValid = this.onCheckCodeValid.bind(this);
     }
@@ -36,7 +37,7 @@ class ResetPassword extends BaseView {
                 this.dispatch({
                     type: 'resetPassword',
                     payload: {
-                        code: validCode,
+                        ticket: validCode,
                         password: encryptPassword(password),
                     }
                 }).then((result) => {
@@ -115,6 +116,18 @@ class ResetPassword extends BaseView {
             .catch(resolve);
         });
     }
+    checkPhone() {
+        const { form: { validateFields } } = this.props;
+        return new Promise((resolve) => {
+            validateFields(['phone'], (err) => {
+                if (err) {
+                    return resolve();
+                }
+                return resolve(true);
+            });
+        });
+        
+    }
     onTogglePwdType() {
         this.setState({
             showPassWord: !this.state.showPassWord,
@@ -180,6 +193,9 @@ class ResetPassword extends BaseView {
                                                         rules: [{
                                                             required: true,
                                                             message: '请输入手机号',
+                                                        }, {
+                                                            pattern: /^1\d{10}$/,
+                                                            message: '手机号码不合法',
                                                         }],
                                                     })(<Input placeholder="请输入手机号" />)}
                                                 </Form.Item>
@@ -196,7 +212,8 @@ class ResetPassword extends BaseView {
                                                     <SendSmsButton
                                                         className="btn-send-code"
                                                         onSendSms={this.onSendSms}
-                                                        reset={!showNext}
+                                                        beforeSend={this.checkPhone}
+                                                        reset={showNext}
                                                     >
                                                         获取验证码
                                                     </SendSmsButton>

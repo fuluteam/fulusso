@@ -16,9 +16,11 @@ axios.defaults.timeout = 30000;
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 axios.interceptors.request.use((config) => {
-    if (config.url.endsWith('api/User/GetUserInfo')) {
+    if (localStorage.getItem('access_token')) {
         config.headers.Authorization = `Bearer ${localStorage.getItem('access_token')}`;
     }
+    // if (config.url.endsWith('api/User/GetUserInfo')) {
+    // }
     return config;
 }, (error) => {
     return Promise.reject(error);

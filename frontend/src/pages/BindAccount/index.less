@@ -1,0 +1,114 @@
+@import '../../assets/css/params.less';
+@import '../../assets/css/theme.less';
+@import '../../assets/css/common.less';
+
+.bind-account {
+    .wrap-box {
+        position: relative;
+        top: 0;
+    }
+    .content-box {
+        width: 650px;
+        position: relative;
+        margin: 20px auto auto;
+        left: auto;
+        top: auto;
+        height: auto;
+    }
+    .bind-account-title {
+        margin-top: 45px;
+        font-size: 24px;
+        color: rgb(51, 51, 51);
+        padding-left: 20px;
+    }
+    .bind-account-box {
+        padding: 16px 0;
+        .bind-content {
+            padding: 20px;
+            border: 2px solid #f1f1f1;
+            background: #fff;
+            .bind-select-header {
+                padding-left: 35px;
+                cursor: pointer;
+                .check-icon {
+                    float: left;
+                    display: inline-block;
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    margin-left: -35px;
+                    font-style: normal;
+                    color: #fff;
+                    text-align: center;
+                    border: 1px solid #f1f1f1;
+                }
+                p {
+                    font-size: 18px;
+                    line-height: 22px;
+                    color: #000;
+                    margin-bottom: 0;
+                    &.sub {
+                        font-size: 14px;
+                        color: #999;
+                        margin-top: 8px;
+                    }
+                }
+            }
+            .bind-main {
+                margin-top: 18px;
+                border-top: 1px dashed #e5e5e5;
+                padding-top: 30px;
+                .ant-form-item {
+                    width: 300px;
+                    margin: 0 auto 10px;
+                    & + .ant-form-item {
+                        margin-top: 30px;
+                    }
+                }
+            }
+            &.active {
+                border-color: #336AFF;
+                .check-icon {
+                    background: #336AFF;
+                    &:after {
+                        content: '✔';
+                        font-family: sans-serif;
+                    }
+                }
+            }
+            & + .bind-content {
+                margin-top: 30px;
+            }
+        }
+        .ant-btn-primary {
+            width: 100%;
+        }
+        .link-user-rules {
+            margin-left: -2px;
+            letter-spacing: -0.5px;
+        }
+    }
+    .bind-success-box {
+        margin-top: 150px;
+    }
+    .bind-success {
+        position: relative;
+        font-size: 15px;
+        text-align: center;
+        font-weight: bold;
+        color: #000;
+        .bind-success-img {
+            width: 130px;
+            height: 130px;
+            margin: auto;
+            background: url("../../assets/image/gou.png");
+        }
+        .bind-success-word {
+            margin-top: 55px;
+        }
+        .redirect-to-login {
+            margin-top: 30px;
+            font-size: 14px;
+        }
+    }
+}

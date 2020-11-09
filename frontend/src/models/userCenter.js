@@ -73,9 +73,6 @@ export default {
                 showError: false,
             });
         },
-        async sendCodeToNewPhone(payload) {
-            return execEffect(this, { effectName: 'sendCodeToNewPhone', payload, loadStatusKey: 'smsLoading' });
-        },
         async validateUser(payload) {
             return execEffect(this, { effectName: 'validateUser', dataKey: 'validate', payload });
         },
@@ -111,7 +108,7 @@ export default {
                     const thirdPartyBind = this.getStore('thirdPartyBind');
                     const _thirdPartyBind = thirdPartyBind || [];
                     const newArr = _thirdPartyBind.filter((item) => {
-                        return item !== payload.provider;
+                        return item.loginProvider !== payload.loginProvider;
                     });
                     return {
                         thirdPartyBind: newArr,
@@ -133,19 +130,6 @@ export default {
         async signOut() {
             const result = await service.signOut();
             return result;
-        },
-        async changeValidateMode(payload) {
-            return execEffect(this, {
-                effectName: 'changeValidateMode',
-                dataKey: 'validateMode',
-                payload,
-                callback: function changeMode() {
-                    const user = this.getStore('user');
-                    return {
-                        user: Object.assign({}, user, { validateModePriority: payload.validateModePriority }),
-                    };
-                },
-            });
         },
     },
 };
