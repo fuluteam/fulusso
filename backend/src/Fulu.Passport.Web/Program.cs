@@ -1,5 +1,4 @@
-﻿using FuLu.IdentityServer;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
 namespace Fulu.Passport.Web

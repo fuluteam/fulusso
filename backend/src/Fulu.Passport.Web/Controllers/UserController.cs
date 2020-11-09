@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using Fulu.Core;
 using Fulu.Core.Extensions;
+using Fulu.Passport.Domain.Entities;
 using FuLu.Passport.Domain.Entities;
 using Fulu.Passport.Domain.Interface;
 using FuLu.Passport.Domain.Interface;
-using Fulu.Passport.Domain.Interface.Services;
+using Fulu.Passport.Domain.Interface.CacheStrategy;
 using FuLu.Passport.Domain.Interface.Services;
 using Fulu.Passport.Domain.Models;
 using FuLu.Passport.Domain.Models;
@@ -17,7 +20,10 @@ using Fulu.WebAPI.Abstractions;
 using IdentityModel;
 using IdentityServer4;
 using IdentityServer4.Configuration;
+using IdentityServer4.Extensions;
+using IdentityServer4.Models;
 using IdentityServer4.Services;
+using IdentityServer4.Stores;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -30,16 +36,18 @@ namespace Fulu.Passport.Web.Controllers
     /// </summary>
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController : Controller
     {
         private readonly AppSettings _appSettings;
         private readonly IUserService _userService;
+        private readonly Domain.Options.Endpoints _endpoints;
         private readonly UserInteractionOptions _interactionOptions;
         private readonly IValidationComponent _validationComponent;
         private readonly IExternalClient _externalClient;
         private readonly IIdentityServerInteractionService _interaction;
-        private readonly IExternalUserService _externalUserService;
-        public UserController(IUserService userService, AppSettings appSettings, UserInteractionOptions interactionOptions, IValidationComponent validationComponent, IExternalClient externalClient, IIdentityServerInteractionService interaction, IExternalUserService externalUserService)
+        private readonly IExternalUserCacheStrategy _externalUserService;
+        private readonly IMessageStore<ErrorMessage> _errorMessageStore;
+        public UserController(IUserService userService, AppSettings appSettings, UserInteractionOptions interactionOptions, IValidationComponent validationComponent, IExternalClient externalClient, IIdentityServerInteractionService interaction, IExternalUserCacheStrategy externalUserService, Domain.Options.Endpoints endpoints, IMessageStore<ErrorMessage> errorMessageStore)
         {
             _userService = userService;
             _appSettings = appSettings;
@@ -48,6 +56,8 @@ namespace Fulu.Passport.Web.Controllers
             _externalClient = externalClient;
             _interaction = interaction;
             _externalUserService = externalUserService;
+            _endpoints = endpoints;
+            _errorMessageStore = errorMessageStore;
         }
 
         /// <summary>
@@ -155,15 +165,18 @@ namespace Fulu.Passport.Web.Controllers
         /// <summary>
         /// 短信登录绑定
         /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPost]
+        [HttpPost, AllowAnonymous]
         public async Task<IActionResult> LoginByCodeBind(LoginByCodeBindModel model)
         {
-            if (!User.Claims.Any())
-                return ObjectResponse.Ok(10026, "操作超时，请重新授权");
-            var loginProvider = User.Claims.FirstOrDefault(x => x.Type == CusClaimTypes.LoginProvider)?.Value;
-            var providerKey = User.Claims.FirstOrDefault(x => x.Type == CusClaimTypes.ProviderKey)?.Value;
+            var result = await HttpContext.AuthenticateAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
+            if (result.Succeeded == false)
+            {
+                return ObjectResponse.Ok(10026, "External authentication error");
+            }
+
+            var (loginProvider, providerKey) = GetExternalUser(result);
+
+
             if (loginProvider.IsEmpty() || providerKey.IsEmpty())
                 return ObjectResponse.Ok(10026, "操作超时，请重新授权");
 
@@ -197,6 +210,7 @@ namespace Fulu.Passport.Web.Controllers
             {
                 return ObjectResponse.Ok(bindResult.Code, bindResult.Message);
             }
+            await HttpContext.SignOutAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
             await SignIn(account, UserLoginModel.External);
             return ObjectResponse.Ok();
         }
@@ -204,13 +218,17 @@ namespace Fulu.Passport.Web.Controllers
         /// <summary>
         /// 密码登录绑定
         /// </summary>
-        [HttpPost]
+        [HttpPost, AllowAnonymous]
         public async Task<IActionResult> LoginByPassBind(LoginByPassBindModel model)
         {
-            if (!User.Claims.Any())
-                return ObjectResponse.Ok(10026, "操作超时，请重新授权");
-            var loginProvider = User.Claims.FirstOrDefault(x => x.Type == CusClaimTypes.LoginProvider)?.Value;
-            var providerKey = User.Claims.FirstOrDefault(x => x.Type == CusClaimTypes.ProviderKey)?.Value;
+            var result = await HttpContext.AuthenticateAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
+            if (result.Succeeded == false)
+            {
+                return ObjectResponse.Ok(10026, "External authentication error");
+            }
+
+            var (loginProvider, providerKey) = GetExternalUser(result);
+
             if (loginProvider.IsEmpty() || providerKey.IsEmpty())
                 return ObjectResponse.Ok(10026, "操作超时，请重新授权");
 
@@ -219,8 +237,126 @@ namespace Fulu.Passport.Web.Controllers
             {
                 return ObjectResponse.Ok(loginResult.Code, loginResult.Message);
             }
+            await HttpContext.SignOutAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
             await SignIn(loginResult.Data, UserLoginModel.External);
             return ObjectResponse.Ok();
+        }
+
+        /// <summary>
+        /// 外部账号登录
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpGet, AllowAnonymous]
+        public IActionResult ExternalLogin([FromQuery] ExternalLoginModel model)
+        {
+            var authenticationProperties = new AuthenticationProperties()
+            {
+                RedirectUri = Url.Action(nameof(ExternalLoginCallback)),
+                Items =
+                {
+                    { "returnUrl", model.ReturnUrl },
+                    { "scheme", model.Provider },
+                }
+            };
+
+            return Challenge(authenticationProperties, model.Provider);
+        }
+
+        /// <summary>
+        /// 外部登录回调
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginCallback()
+        {
+            var result = await HttpContext.AuthenticateAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
+
+            var returnUrl = result.Properties.Items["returnUrl"];
+
+            if (result.Succeeded == false)
+            {
+                return await RedirectErrorResult("error", "External authentication error", returnUrl);
+            }
+
+            var (loginProvider, providerKey) = GetExternalUser(result);
+
+            var externalUserEntity = await _externalUserService.GetExternalUser(_appSettings.ClientId, providerKey);
+
+            UserEntity userEntity;
+
+            if (externalUserEntity == null)
+            {//1.第三方用户未绑定
+                if (!HttpContext.User.Identity.IsAuthenticated) //用户未登录，引导用户绑定
+                {
+                    var bindUrl = _endpoints.BindUrl;
+                    if (!string.IsNullOrEmpty(bindUrl))
+                        bindUrl = $"{bindUrl}?ReturnUrl={HttpUtility.UrlEncode(returnUrl, Encoding.UTF8)}";
+                    return Redirect(bindUrl);
+                }
+
+                //用户已登录，直接绑定
+                var userId = HttpContext.User.GetUserId();
+                userEntity = await _userService.GetUserByIdAsync(userId);
+
+                if (userEntity != null)
+                    await _externalUserService.BindExternalUser(_appSettings.ClientId, userEntity.Id,
+                        providerKey, loginProvider, string.Empty);
+
+                return Redirect(_endpoints.CenterUrl);
+            }
+
+            //2.第三方用户已绑定
+
+            if (HttpContext.User.Identity.IsAuthenticated)
+            {//用户已登录
+                if (User.GetUserId() == externalUserEntity.UserId)
+                    return Redirect(returnUrl);
+                return await RedirectErrorResult("绑定失败", "已绑定过其他通行证账号", returnUrl);
+            }
+
+            //用户未登录，获取用户进行登录
+            userEntity = await _userService.GetUserByIdAsync(externalUserEntity.UserId);
+
+            if (userEntity == null)
+            {
+                return await RedirectErrorResult("登录失败", "用户不存在或未注册", returnUrl);
+            }
+
+            if (userEntity.Enabled == false)
+            {
+                return await RedirectErrorResult("登录失败", "您的账号已被禁止登录", returnUrl);
+            }
+
+            await HttpContext.SignOutAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
+            await SignIn(userEntity, UserLoginModel.External);
+
+            return Redirect(returnUrl);
+        }
+
+        private (string loginProvider, string providerKey) GetExternalUser(AuthenticateResult result)
+        {
+            var externalUser = result.Principal;
+            var userIdClaim = externalUser.FindFirst(JwtClaimTypes.Subject) ??
+                              externalUser.FindFirst(ClaimTypes.NameIdentifier) ??
+                              throw new Exception("Unknown userid");
+            var loginProvider = result.Properties.Items["scheme"];
+            var providerKey = userIdClaim.Value;
+
+            return (loginProvider, providerKey);
+        }
+
+        private async Task<RedirectResult> RedirectErrorResult(string error, string errorDescription, string redirectUri)
+        {
+            var msg = new Message<ErrorMessage>(new ErrorMessage
+            {
+                Error = error,
+                ErrorDescription = errorDescription,
+                RedirectUri = redirectUri
+            }, DateTime.UtcNow);
+            var id = await _errorMessageStore.WriteAsync(msg);
+            return Redirect($"{_interactionOptions.ErrorUrl}?errorId={id}");
         }
     }
 }

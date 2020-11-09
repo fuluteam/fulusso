@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Fulu.Core.Extensions;
 using Fulu.Passport.Domain.Interface.Services;
 using FuLu.IdentityServer.Stores;
+using Fulu.Passport.Domain.Interface.CacheStrategy;
 using FuLu.Passport.Domain.Interface.Services;
 using FuLu.Passport.Domain.Models;
 using IdentityServer4.Models;
@@ -13,10 +14,10 @@ namespace Fulu.Passport.Web.Validator
 {
     public class ExternalGrantValidator : IExtensionGrantValidator
     {
-        private readonly IExternalUserService _userExternalService;
+        private readonly IExternalUserCacheStrategy _userExternalService;
         private readonly IUserService _userService;
         private readonly IHttpContextAccessor _contextAccessor;
-        public ExternalGrantValidator(IExternalUserService userExternalService, IUserService userService, IHttpContextAccessor contextAccessor)
+        public ExternalGrantValidator(IExternalUserCacheStrategy userExternalService, IUserService userService, IHttpContextAccessor contextAccessor)
         {
             _userExternalService = userExternalService;
             _userService = userService;

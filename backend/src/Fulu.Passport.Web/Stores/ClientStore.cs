@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Fulu.Core.Extensions;
 using FuLu.IdentityServer.Stores;
+using Fulu.Passport.Domain.Interface.CacheStrategy;
 using Fulu.Passport.Domain.Interface.Repositories;
 using IdentityModel;
 using IdentityServer4.Models;
@@ -10,9 +11,9 @@ namespace IdentityServer4.Stores
 {
     public class ClientStore : IClientStore
     {
-        private readonly IClientInCacheRepository _clientInCacheRepository;
+        private readonly IClientCacheStrategy _clientInCacheRepository;
 
-        public ClientStore(IClientInCacheRepository clientInCacheRepository)
+        public ClientStore(IClientCacheStrategy clientInCacheRepository)
         {
             _clientInCacheRepository = clientInCacheRepository;
         }

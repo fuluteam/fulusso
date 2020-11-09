@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Fulu.Core.Extensions;
 using FuLu.Passport.Domain.Entities;
+using Fulu.Passport.Domain.Interface.CacheStrategy;
 using Fulu.Passport.Domain.Interface.Repositories;
 using FuLu.Passport.Domain.Interface.Repositories;
 using Fulu.Passport.Domain.Models;
@@ -26,8 +27,8 @@ namespace Fulu.Passport.API.Controllers
         private readonly IMapper _mapper;
         private readonly IClientRepository _clientRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IClientInCacheRepository _clientInCacheRepository;
-        public ClientController(IClientRepository clientRepository, IMapper mapper, IUnitOfWork unitOfWork, IClientInCacheRepository clientInCacheRepository)
+        private readonly IClientCacheStrategy _clientInCacheRepository;
+        public ClientController(IClientRepository clientRepository, IMapper mapper, IUnitOfWork unitOfWork, IClientCacheStrategy clientInCacheRepository)
         {
             _clientRepository = clientRepository;
             _mapper = mapper;

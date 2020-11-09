@@ -14,6 +14,8 @@
     <ProjectReference Include="..\Fulu.AspNetCore\Fulu.AspNetCore.csproj" />
     <ProjectReference Include="..\Fulu.Document\Fulu.Document.csproj" />
     <ProjectReference Include="..\Fulu.Passport.Domain\Fulu.Passport.Domain.csproj" />
+    <ProjectReference Include="..\Microsoft.AspNetCore.Authentication.DingTalk\Microsoft.AspNetCore.Authentication.DingTalk.csproj" />
+    <ProjectReference Include="..\Microsoft.AspNetCore.Authentication.WeChat\Microsoft.AspNetCore.Authentication.WeChat.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Fulu.AutoDI;
+using Fulu.Core.Extensions;
+using FuLu.IdentityServer;
 using FuLu.IdentityServer.Stores;
 using Fulu.Passport.Domain;
 using Fulu.Passport.Domain.Interface;
@@ -11,10 +12,12 @@ using Fulu.Passport.Domain.Options;
 using FuLu.Passport.Domain.Options;
 using Fulu.Passport.Domain.Services;
 using Fulu.Passport.Web.Validator;
+using IdentityServer4;
 using IdentityServer4.Configuration;
 using IdentityServer4.Services;
 using IdentityServer4.Stores;
 using IdentityServer4.Validation;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -25,7 +28,7 @@ using Microsoft.Extensions.Hosting;
 using Org.BouncyCastle.Utilities.Encoders;
 using StackExchange.Redis;
 
-namespace FuLu.IdentityServer
+namespace Fulu.Passport.Web
 {
     public class Startup
     {
@@ -76,15 +79,6 @@ namespace FuLu.IdentityServer
             //添加EF Core
             ConfigureEntityFrameworkCore(services, connectionStrings);
 
-
-            if (!Env.IsProduction())
-            {
-                foreach (KeyValuePair<string, string> item in Configuration.AsEnumerable())
-                {
-                    Console.WriteLine($"{item.Key} : {item.Value}");
-                }
-            }
-
         }
 
         private void ConfigureInit(IServiceCollection services, AppSettings appSettings, Endpoints endpoints)
@@ -133,18 +127,54 @@ namespace FuLu.IdentityServer
             });
 
             services.AddTransferJob();
+
+            services.AddAuthentication()
+                .AddWeChat(o =>
+            {
+                o.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                o.ClientId = Configuration["ExternalWeChat:AppId"];
+                o.ClientSecret = Configuration["ExternalWeChat:Secret"];
+            })
+                .AddDingTalk(o =>
+            {
+                o.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+                o.ClientId = Configuration["ExternalDingTalk:AppId"];
+                o.ClientSecret = Configuration["ExternalDingTalk:Secret"];
+            });
         }
 
         private void ConfigureIdentityServer(IServiceCollection services, UserInteractionOptions userInteractionOptions, AppSettings appSettings)
         {
-            var identityServerBuilder = services.AddIdentityServer(opt =>
+
+            var identityServerBuilder = services.AddIdentityServer(o =>
             {
-                opt.InputLengthRestrictions.Password = 256;
-                opt.InputLengthRestrictions.TokenHandle = 200;
-                opt.IssuerUri = "http://localhost:80";
-                opt.AccessTokenJwtType = "JWT";
-                opt.UserInteraction = userInteractionOptions;
+                o.Authentication = new AuthenticationOptions
+                {
+                    CookieLifetime = TimeSpan.FromSeconds(7200),
+                    CookieSlidingExpiration = false
+                };
+                o.InputLengthRestrictions = new InputLengthRestrictions
+                {
+                    Password = 256,
+                    TokenHandle = 200
+                };
+                o.IssuerUri = "http://localhost:80";
+                o.AccessTokenJwtType = "JWT";
+                o.UserInteraction = userInteractionOptions;
             });
+
+            var cookieDomain = Configuration["CookieDomain"];
+            if (!cookieDomain.IsEmpty())
+            {
+                services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,
+                        opt => { opt.Cookie.Domain = Configuration["CookieDomain"]; });
+                services.AddAuthorization(opt =>
+                {
+                    opt.AddPolicy("TwoFactorEnabled", x => x.RequireClaim("amr", "mfa"));
+                });
+            }
+
             identityServerBuilder.AddSigningCredential(new X509Certificate2(Hex.Decode(appSettings.X509RawCertData), appSettings.X509CertPwd));
             identityServerBuilder.AddClientStore<ClientStore>();
             identityServerBuilder.AddResourceStore<ResourceStore>();
@@ -154,22 +184,9 @@ namespace FuLu.IdentityServer
             identityServerBuilder.AddCustomAuthorizeRequestValidator<CustomAuthorizeRequestValidator>();
             identityServerBuilder.AddExtensionGrantValidator<SmsGrantValidator>();
             identityServerBuilder.AddExtensionGrantValidator<ExternalGrantValidator>();
-            identityServerBuilder.Services.AddScoped<IUserSession, IdentityServer4.Services.FuluUserSession>();
 
             services.AddTransient<IHandleGenerationService, CustomHandleGenerationService>();
             services.AddTransient<IAuthorizationCodeStore, AuthorizationCodeStore>();
-
-            identityServerBuilder.AddDingTalk(opt =>
-            {
-                opt.AppId = Configuration["ExternalDingTalk:AppId"];
-                opt.Secret = Configuration["ExternalDingTalk:Secret"];
-            });
-
-            identityServerBuilder.AddWechat(opt =>
-            {
-                opt.AppId = Configuration["ExternalWeChat:AppId"];
-                opt.Secret = Configuration["ExternalWeChat:Secret"];
-            });
         }
 
         /// <summary>
@@ -213,6 +230,7 @@ namespace FuLu.IdentityServer
             app.UseMiddleware<CompatibilityPassportMiddleware>();
             app.UseIdentityServer();
             app.UseRouting();
+            app.UseAuthentication();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");

@@ -4,12 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Fulu.Core.Extensions;
-using Fulu.Passport.Domain.Interface.Services;
+using Fulu.Passport.Domain.Interface.CacheStrategy;
+using Fulu.Passport.Domain.Interface.Repositories;
 using Fulu.Passport.Domain.Models;
 using Fulu.WebAPI.Abstractions;
 using IdentityModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Fulu.Passport.API.Controllers
 {
@@ -21,12 +24,19 @@ namespace Fulu.Passport.API.Controllers
     public class ExternalUserController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly IExternalUserService _externalUserService;
-        public ExternalUserController(IExternalUserService externalUserService, IMapper mapper)
+        private readonly IExternalUserCacheStrategy _externalUserService;
+        private readonly ILogger<ExternalUserController> _logger;
+        private readonly IExternalUserRepository _externalUserRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        public ExternalUserController(IExternalUserCacheStrategy externalUserService, IMapper mapper, ILogger<ExternalUserController> logger, IExternalUserRepository externalUserRepository, IUnitOfWork unitOfWork)
         {
             _externalUserService = externalUserService;
             _mapper = mapper;
+            _logger = logger;
+            _externalUserRepository = externalUserRepository;
+            _unitOfWork = unitOfWork;
         }
+
         /// <summary>
         /// （♂）获取用户绑定列表
         /// </summary>
@@ -35,6 +45,9 @@ namespace Fulu.Passport.API.Controllers
         [ProducesResponseType(typeof(ActionObjectResult<List<GetExternalUserOutputDto>, Statistic>), 200)]
         public async Task<IActionResult> GetUsers()
         {
+            var clientId = User.GetClientId();
+            _logger.LogInformation(clientId);
+
             var externalUsers = await _externalUserService.GetExternalUsers(User.GetClientId().ToInt32(), User.GetUserId());
 
             var getUserOutputs = _mapper.Map<List<GetExternalUserOutputDto>>(externalUsers);
@@ -86,6 +99,23 @@ namespace Fulu.Passport.API.Controllers
             await _externalUserService.UnBindExternalUser(User.GetClientId().ToInt32(), User.GetUserId(),
                 inputDto.LoginProvider);
 
+            return ObjectResponse.Ok();
+        }
+
+        /// <summary>
+        /// 删除数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("id")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var externalUser = await _externalUserRepository.TableNoTracking.FirstOrDefaultAsync(x => x.Id == id);
+            if (externalUser != null)
+            {
+                _externalUserRepository.Delete(externalUser);
+                await _unitOfWork.SaveChangesAsync();
+            }
             return ObjectResponse.Ok();
         }
     }

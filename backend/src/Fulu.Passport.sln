@@ -53,6 +53,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fulu.Authentication", "Fulu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fulu.Service.Authorize", "Fulu.Service.Authorize\Fulu.Service.Authorize.csproj", "{9C7A4156-303D-4A36-8858-395CA7BD33AC}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Authentication.WeChat", "Microsoft.AspNetCore.Authentication.WeChat\Microsoft.AspNetCore.Authentication.WeChat.csproj", "{18D38EBB-C78A-4D92-ABB3-675FD7033F74}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Authentication.DingTalk", "Microsoft.AspNetCore.Authentication.DingTalk\Microsoft.AspNetCore.Authentication.DingTalk.csproj", "{F4E6DB40-2C5F-4FE7-BDAD-47F4FFCF5B42}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +131,14 @@ Global
 		{9C7A4156-303D-4A36-8858-395CA7BD33AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C7A4156-303D-4A36-8858-395CA7BD33AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C7A4156-303D-4A36-8858-395CA7BD33AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18D38EBB-C78A-4D92-ABB3-675FD7033F74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18D38EBB-C78A-4D92-ABB3-675FD7033F74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18D38EBB-C78A-4D92-ABB3-675FD7033F74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18D38EBB-C78A-4D92-ABB3-675FD7033F74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4E6DB40-2C5F-4FE7-BDAD-47F4FFCF5B42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4E6DB40-2C5F-4FE7-BDAD-47F4FFCF5B42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4E6DB40-2C5F-4FE7-BDAD-47F4FFCF5B42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4E6DB40-2C5F-4FE7-BDAD-47F4FFCF5B42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -149,6 +161,8 @@ Global
 		{2F6A1340-B68F-44EF-AA6C-3E09818F6FCA} = {B2E911B9-FCE6-41F0-A191-C4574B18CBED}
 		{9B2D318E-40EC-438F-B7AD-3B93F34E6C45} = {AE381F57-5314-4C4B-B183-E7909459C36C}
 		{9C7A4156-303D-4A36-8858-395CA7BD33AC} = {AE381F57-5314-4C4B-B183-E7909459C36C}
+		{18D38EBB-C78A-4D92-ABB3-675FD7033F74} = {AE381F57-5314-4C4B-B183-E7909459C36C}
+		{F4E6DB40-2C5F-4FE7-BDAD-47F4FFCF5B42} = {AE381F57-5314-4C4B-B183-E7909459C36C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9158FC8E-9B83-4146-9129-DA23A448062E}
