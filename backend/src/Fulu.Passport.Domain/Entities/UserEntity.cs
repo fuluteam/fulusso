@@ -31,8 +31,8 @@ namespace FuLu.Passport.Domain.Entities
         public string Password { get; set; }
         [Column("birthday")]
         public DateTime? Birthday { get; set; }
-        //[Column("activated")]
-        //public bool Activated { get; set; }
+        [Column("salt")]
+        public string Salt { get; set; }
         [Column("locked")]
         public bool Locked { get; set; }
         [Column("enabled")]

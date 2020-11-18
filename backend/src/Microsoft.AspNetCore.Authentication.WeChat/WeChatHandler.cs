@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -38,11 +37,6 @@ namespace Microsoft.AspNetCore.Authentication.WeChat
             {
                 properties.RedirectUri = currentUri;
             }
-
-            //if (!string.IsNullOrEmpty(Options.CallbackPath))
-            //{
-            //    redirectUri = Options.CallbackPath;
-            //}
 
             var queryStrings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
             {
@@ -150,16 +144,6 @@ namespace Microsoft.AspNetCore.Authentication.WeChat
 
             var response =
                 await Backchannel.PostAsync(Options.TokenEndpoint, urlEncodedContent, Context.RequestAborted);
-
-            //var response = await Backchannel.SendAsync(new HttpRequestMessage(HttpMethod.Post, Options.TokenEndpoint)
-            //{
-            //    Headers = {
-            //        Accept = {
-            //            new MediaTypeWithQualityHeaderValue("application/json")
-            //        }
-            //    },
-            //    Content = urlEncodedContent
-            //}, Context.RequestAborted);
 
             return response.IsSuccessStatusCode ? OAuthTokenResponse.Success(JsonDocument.Parse(await response.Content.ReadAsStringAsync())) : OAuthTokenResponse.Failed(new Exception("OAuth token failure"));
         }

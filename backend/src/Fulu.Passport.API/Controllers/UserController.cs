@@ -10,6 +10,7 @@ using Fulu.Passport.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Fulu.BouncyCastle;
+using Fulu.Core.Regular;
 using Fulu.Passport.Domain;
 using FuLu.Passport.Domain.Options;
 using FuLu.Passport.Domain.Interface.Services;
@@ -52,12 +53,12 @@ namespace Fulu.Passport.API.Controllers
         [ProducesResponseType(typeof(ActionObjectResult), 200)]
         public async Task<IActionResult> Register(RegisterInputDto inputDto)
         {
-            var password = _encryptService.DecryptRsa(inputDto.Password);
+            var password = _encryptService.DecryptPassword(inputDto.Password);
 
             if (string.IsNullOrEmpty(password))
                 return ObjectResponse.Error("密码格式不正确");
 
-            if (Regex.IsMatch(password, RegexConstance.IsPassword) == false)
+            if (Regex.IsMatch(password, RegExp.Password) == false)
             {
                 return ObjectResponse.Error(password.Length < 6 ? "密码长度不能少于6个字符" : "密码长度不能超过20个字符");
             }
@@ -91,12 +92,12 @@ namespace Fulu.Passport.API.Controllers
         [ProducesResponseType(typeof(ActionObjectResult<RegisterOutputDto>), 200)]
         public async Task<ActionResult> ResetPassword(ResetPasswordInputDto inputDto)
         {
-            var password = _encryptService.DecryptRsa(inputDto.Password);
+            var password = _encryptService.DecryptPassword(inputDto.Password);
 
             if (string.IsNullOrEmpty(password))
                 return ObjectResponse.Error("密码格式不正确");
 
-            if (Regex.IsMatch(password, RegexConstance.IsPassword) == false)
+            if (Regex.IsMatch(password, RegExp.Password) == false)
                 return ObjectResponse.Error(password.Length < 6 ? "密码长度不能少于6个字符" : "密码长度不能超过20个字符");
 
             var phone = await _validationComponent.GetTicketPhoneAsync(inputDto.Ticket);

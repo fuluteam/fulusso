@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace FuLu.Passport.Domain.Entities
@@ -10,7 +11,7 @@ namespace FuLu.Passport.Domain.Entities
         public string Id { get; set; }
         [Column("full_name")]
         public string FullName { get; set; }
-        [Column("client_id")]
+        [Column("client_id"),Key]
         public int ClientId { get; set; }
         [Column("client_secret")]
         public string ClientSecret { get; set; }

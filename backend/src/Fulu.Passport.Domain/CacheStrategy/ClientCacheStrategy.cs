@@ -47,7 +47,6 @@ namespace Fulu.Passport.Domain.CacheStrategy
                 {
                     return clientEntity;
                 }
-
                 clientEntity = await _clientRepository.TableNoTracking.FirstOrDefaultAsync(c => c.ClientId == clientId);
 
                 if (clientEntity != null)

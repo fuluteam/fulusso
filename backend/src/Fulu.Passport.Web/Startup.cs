@@ -174,7 +174,7 @@ namespace Fulu.Passport.Web
                     opt.AddPolicy("TwoFactorEnabled", x => x.RequireClaim("amr", "mfa"));
                 });
             }
-
+         
             identityServerBuilder.AddSigningCredential(new X509Certificate2(Hex.Decode(appSettings.X509RawCertData), appSettings.X509CertPwd));
             identityServerBuilder.AddClientStore<ClientStore>();
             identityServerBuilder.AddResourceStore<ResourceStore>();
@@ -195,7 +195,7 @@ namespace Fulu.Passport.Web
         private void ConfigureEntityFrameworkCore(IServiceCollection services, ConnectionStrings connectionStrings)
         {
             //添加King
-            services.AddEntityFrameworkCore<FuluDbContext>(opt => opt.UseMySql(connectionStrings.MySql));
+            services.AddEntityFrameworkCore<FuluDbContext>(opt => opt.UseMySql(connectionStrings.MySql, b => b.MigrationsAssembly("Fulu.Passport.Web")));
         }
         /// <summary>
         /// Cache

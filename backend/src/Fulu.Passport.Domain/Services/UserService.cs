@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Fulu.BouncyCastle;
+using Fulu.Core;
 using Fulu.Passport.Domain.Interface.Services;
 using Fulu.WebAPI.Abstractions;
 using IdentityModel;
@@ -50,8 +51,8 @@ namespace FuLu.Passport.Domain.Services
         /// </summary>
         public async Task<UserEntity> GetUserByIdAsync(string userId)
         {
+          
             var userEntity = new UserEntity { Id = userId };
-
             userEntity = await _redisCache.ObjectGetAsync(userEntity);
             if (userEntity != null)
             {
@@ -102,7 +103,7 @@ namespace FuLu.Passport.Domain.Services
         /// </summary>
         public async Task<UserEntity> RegisterAsync(string phone, string password, int clientId, string clientName, string ip, string nickName = "")
         {
-            var passwd = _encryptService.EncryptAes(password);
+
             var userEntity = new UserEntity
             {
                 Id = Guid.NewGuid().ToString("D"),
@@ -112,7 +113,6 @@ namespace FuLu.Passport.Domain.Services
                 Phone = phone,
                 UserName = Guid.NewGuid().ToString("D"),
                 Gender = 0,
-                Password = passwd,
                 Birthday = DateTime.Now,
                 RegisterTime = DateTime.Now,
                 RegisterIp = ip,
@@ -124,6 +124,8 @@ namespace FuLu.Passport.Domain.Services
                 LastTryLoginTime = null,
                 EnabledTwoFactor = true
             };
+            userEntity.Salt = Str.GetRandomString(16);
+            userEntity.Password = _encryptService.EncryptPassword(password, userEntity.Salt);
 
             await _userRepository.InsertAsync(userEntity);
             await _unitOfWork.SaveChangesAsync();
@@ -138,7 +140,7 @@ namespace FuLu.Passport.Domain.Services
         public async Task ResetPasswordAsync(string phone, string newPassword)
         {
             var userEntity = await _userRepository.Table.FirstOrDefaultAsync(c => c.Phone == phone);
-            userEntity.Password = _encryptService.EncryptAes(newPassword);
+            userEntity.Password = _encryptService.EncryptPassword(newPassword, userEntity.Salt);
             userEntity.LoginErrorCount = 0;
             userEntity.LastTryLoginTime = null;
             userEntity.Locked = false;
@@ -203,7 +205,7 @@ namespace FuLu.Passport.Domain.Services
         /// </summary>
         public async Task<ActionObjectResult<UserEntity>> LoginByPasswordAsync(string phone, string cipherPass)
         {
-            var password = _encryptService.DecryptRsa(cipherPass);
+            var password = _encryptService.DecryptPassword(cipherPass);
             if (string.IsNullOrEmpty(password))
                 return ActionObject.Ok<UserEntity>(-1, "密码格式不正确");
 
@@ -219,7 +221,7 @@ namespace FuLu.Passport.Domain.Services
             if (userEntity.Locked && lastTypeLoginTime.AddHours(3) > DateTime.Now)
                 return ActionObject.Ok<UserEntity>(-1, "登录密码出错已达上限将锁定密码3小时，请找回密码后登录，或使用短信登录。");
 
-            if (_encryptService.EncryptAes(password) != userEntity.Password)
+            if (_encryptService.EncryptPassword(password, userEntity.Salt) != userEntity.Password)
             {
                 await SaveErrorLoginInfo(userEntity.Id);
                 if (userEntity.LoginErrorCount < 2)

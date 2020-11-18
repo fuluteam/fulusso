@@ -5,7 +5,7 @@ using System.Web;
 using IdentityServer4.Configuration;
 using Microsoft.AspNetCore.Http;
 
-namespace FuLu.IdentityServer
+namespace Fulu.Passport.Web
 {
     public class CompatibilityPassportMiddleware
     {

@@ -2,8 +2,8 @@
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Fulu.Core.Extensions;
+using Fulu.Core.Regular;
 using FuLu.IdentityServer.Stores;
-using Fulu.Passport.Domain;
 using Fulu.Passport.Domain.Interface;
 using FuLu.Passport.Domain.Interface.Services;
 using FuLu.Passport.Domain.Models;
@@ -31,7 +31,7 @@ namespace Fulu.Passport.Web.Validator
         {
             var phone = context.Request.Raw.Get("phone");
             var code = context.Request.Raw.Get("code");
-            if (string.IsNullOrEmpty(phone) || Regex.IsMatch(phone, RegexConstance.IsPhone) == false)
+            if (string.IsNullOrEmpty(phone) || Regex.IsMatch(phone, RegExp.PhoneNumber) == false)
             {
                 context.Result = new GrantValidationResult(TokenRequestErrors.InvalidRequest, "phone is not valid");
                 return;

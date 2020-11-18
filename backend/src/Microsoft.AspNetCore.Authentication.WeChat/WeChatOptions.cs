@@ -22,7 +22,6 @@ namespace Microsoft.AspNetCore.Authentication.WeChat
             TokenEndpoint = WeChatDefaults.TokenEndpoint;
             UserInformationEndpoint = WeChatDefaults.UserInformationEndpoint;
             Scope.Add("snsapi_login");
-            //Scope.Add("snsapi_userinfo");
 
             ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "openid");
             ClaimActions.MapJsonKey(ClaimTypes.Name, "nickname");

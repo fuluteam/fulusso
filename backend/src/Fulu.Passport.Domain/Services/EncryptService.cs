@@ -23,9 +23,9 @@ namespace Fulu.Passport.Domain.Services
         /// <summary>
         /// 加密明文密码入库
         /// </summary>
-        public string EncryptAes(string password)
+        public string EncryptPassword(string password, string salt)
         {
-            return AES.EncryptToBase64(password, _appSettings.AesKey, _appSettings.AesIv, Algorithms.AES_CBC_PKCS7Padding);
+            return HMACSHA256.Compute($"{salt}{password}", _appSettings.HS256Key);
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Fulu.Passport.Domain.Services
         /// </summary>
         /// <param name="cipherText"></param>
         /// <returns></returns>
-        public  string DecryptRsa(string cipherText)
+        public string DecryptPassword(string cipherText)
         {
             try
             {

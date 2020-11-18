@@ -119,7 +119,7 @@ namespace Microsoft.AspNetCore.Authentication.DingTalk
             if (!string.IsNullOrEmpty(tokens.ExpiresIn) && int.TryParse(tokens.ExpiresIn, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result))
             {
                 var dateTimeOffset = Clock.UtcNow + TimeSpan.FromSeconds(result);
-                authenticationTokenList.Add(new AuthenticationToken()
+                authenticationTokenList.Add(new AuthenticationToken
                 {
                     Name = "expires_at",
                     Value = dateTimeOffset.ToString("o", CultureInfo.InvariantCulture)
@@ -149,9 +149,9 @@ namespace Microsoft.AspNetCore.Authentication.DingTalk
                 {"appsecret", Options.ClientSecret}
             };
 
-            var userInfoEndpoint = QueryHelpers.AddQueryString(Options.TokenEndpoint, tokenRequestParameters);
+            var tokenEndpoint = QueryHelpers.AddQueryString(Options.TokenEndpoint, tokenRequestParameters);
 
-            var response = await Backchannel.GetAsync(userInfoEndpoint, Context.RequestAborted);
+            var response = await Backchannel.GetAsync(tokenEndpoint, Context.RequestAborted);
 
             return response.IsSuccessStatusCode ? OAuthTokenResponse.Success(JsonDocument.Parse(await response.Content.ReadAsStringAsync())) : OAuthTokenResponse.Failed(new Exception("OAuth token failure"));
         }

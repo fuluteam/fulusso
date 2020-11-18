@@ -15,9 +15,6 @@ namespace FuLu.Passport.Domain.Options
 
         public string PrivateKey { get; set; }
 
-        public string AesKey { get; set; }
-        public string AesIv { get; set; }
-
         public string HS256Key { get; set; }
 
         public bool DeveloperMode { get; set; }

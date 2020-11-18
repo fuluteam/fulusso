@@ -12,11 +12,11 @@ namespace Fulu.Passport.Domain.Interface.Services
         /// 加密明文密码（入库存储）
         /// </summary>
         /// <returns></returns>
-        string EncryptAes(string password);
+        string EncryptPassword(string password, string salt);
         /// <summary>
         /// 解密前端传入密码
         /// </summary>
         /// <returns></returns>
-        string DecryptRsa(string cipherText);
+        string DecryptPassword(string cipherText);
     }
 }
