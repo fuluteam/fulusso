@@ -64,8 +64,10 @@ namespace Fulu.Passport.Web.Validator
                     return;
                 }
 
-                await _userService.SaveSuccessLoginInfo(context.Request.ClientId.ToInt32(), userEntity.Id, _contextAccessor.HttpContext.GetIp(),
-                     UserLoginModel.SmsCode);
+                var claims = await _userService.SaveSuccessLoginInfo(context.Request.ClientId.ToInt32(), userEntity.Id, _contextAccessor.HttpContext.GetIp(),
+                    UserLoginModel.SmsCode);
+
+                context.Result = new GrantValidationResult(userEntity.UserName, CustomGrantType.Sms, claims);
             }
             catch (Exception ex)
             {
