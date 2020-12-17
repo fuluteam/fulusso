@@ -57,6 +57,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Authen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.AspNetCore.Authentication.DingTalk", "Microsoft.AspNetCore.Authentication.DingTalk\Microsoft.AspNetCore.Authentication.DingTalk.csproj", "{F4E6DB40-2C5F-4FE7-BDAD-47F4FFCF5B42}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSample", "..\sample\WebSample\WebSample.csproj", "{F22C5F65-FFBF-4D83-A3A5-B99C507E107B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -139,6 +141,10 @@ Global
 		{F4E6DB40-2C5F-4FE7-BDAD-47F4FFCF5B42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4E6DB40-2C5F-4FE7-BDAD-47F4FFCF5B42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4E6DB40-2C5F-4FE7-BDAD-47F4FFCF5B42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F22C5F65-FFBF-4D83-A3A5-B99C507E107B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F22C5F65-FFBF-4D83-A3A5-B99C507E107B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F22C5F65-FFBF-4D83-A3A5-B99C507E107B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F22C5F65-FFBF-4D83-A3A5-B99C507E107B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -163,6 +169,7 @@ Global
 		{9C7A4156-303D-4A36-8858-395CA7BD33AC} = {AE381F57-5314-4C4B-B183-E7909459C36C}
 		{18D38EBB-C78A-4D92-ABB3-675FD7033F74} = {AE381F57-5314-4C4B-B183-E7909459C36C}
 		{F4E6DB40-2C5F-4FE7-BDAD-47F4FFCF5B42} = {AE381F57-5314-4C4B-B183-E7909459C36C}
+		{F22C5F65-FFBF-4D83-A3A5-B99C507E107B} = {815AEF24-21F2-4723-89D9-DC9A4CF68CB5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9158FC8E-9B83-4146-9129-DA23A448062E}
