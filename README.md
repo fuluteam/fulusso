@@ -176,7 +176,7 @@ services.AddServiceAuthorize(o =>
 ## 体验
 
 
-演示地址：https://account.suuyuu.cn/
+演示地址：https://account.suuyuu.cn/	(验证码是123456)
 
 代码仓库：https://github.com/fuluteam/fulusso
 
