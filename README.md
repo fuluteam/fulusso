@@ -180,7 +180,7 @@ services.AddServiceAuthorize(o =>
 
 代码仓库：https://github.com/fuluteam/fulusso
 
-
+博客地址：https://www.cnblogs.com/fulu
 
 ---
 
